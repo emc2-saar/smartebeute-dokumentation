@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Imker-Waage · Nachbau-Dokumentation</title>
+<style>
+  :root {
+    --honey:        #f5a623;
+    --honey-dark:   #d9870f;
+    --honey-deep:   #b06a06;
+    --ink:          #2a2016;
+    --ink-soft:     #5a4d3d;
+    --cream:        #fdf8ef;
+    --cream-2:      #f7eeda;
+    --card:         #ffffff;
+    --line:         #ecdfc6;
+    --note:         #fff6e3;
+    --warn-bg:      #fdecea;
+    --warn-line:    #e8a79f;
+    --stop-bg:      #fde2e0;
+    --stop-line:    #d9534f;
+    --ok-bg:        #eaf6e8;
+    --ok-line:      #9bcf93;
+    --info-bg:      #e8f1fb;
+    --info-line:    #9cc2e8;
+    --radius:       14px;
+    --shadow:       0 6px 24px rgba(80, 55, 10, 0.08);
+    --mono:         ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans:         system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--cream);
+    line-height: 1.65;
+  }
+
+  /* ---------- Layout ---------- */
+  .wrap { display: flex; min-height: 100vh; }
+
+  nav.side {
+    width: 280px;
+    flex: 0 0 280px;
+    background: linear-gradient(180deg, #2a2016 0%, #3a2c1b 100%);
+    color: #f3e7d2;
+    padding: 0 0 2rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .brand {
+    padding: 1.6rem 1.5rem 1.2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    gap: .7rem;
+    align-items: center;
+  }
+  .brand .logo {
+    font-size: 1.8rem;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,.3));
+  }
+  .brand h1 {
+    font-size: 1.05rem;
+    margin: 0;
+    letter-spacing: .3px;
+    color: #fff;
+  }
+  .brand span {
+    display: block;
+    font-size: .72rem;
+    color: var(--honey);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+  }
+
+  nav.side ul { list-style: none; margin: 1rem 0 0; padding: 0; }
+  nav.side li a {
+    display: block;
+    padding: .55rem 1.5rem;
+    color: #e6d6ba;
+    text-decoration: none;
+    font-size: .92rem;
+    border-left: 3px solid transparent;
+    transition: all .15s ease;
+  }
+  nav.side li a:hover {
+    background: rgba(245,166,35,0.12);
+    color: #fff;
+    border-left-color: var(--honey);
+  }
+  nav.side li a.sub { padding-left: 2.6rem; font-size: .85rem; color: #c9b696; }
+
+  main {
+    flex: 1 1 auto;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 3rem 3rem 5rem;
+    width: 100%;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    background: linear-gradient(135deg, var(--honey) 0%, var(--honey-dark) 100%);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 2.4rem 2.2rem;
+    margin-bottom: 2.5rem;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: "🐝";
+    position: absolute;
+    right: -10px; bottom: -20px;
+    font-size: 8rem;
+    opacity: .12;
+    transform: rotate(-15deg);
+  }
+  .hero h1 { margin: 0 0 .5rem; font-size: 2rem; }
+  .hero p { margin: 0; max-width: 46ch; color: #fff5e6; }
+  .hero .tag {
+    display: inline-block;
+    background: rgba(255,255,255,.2);
+    padding: .2rem .7rem;
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .5px;
+    margin-bottom: 1rem;
+  }
+
+  /* ---------- Sections & headings ---------- */
+  section { margin-bottom: 3rem; scroll-margin-top: 1.5rem; }
+
+  h2 {
+    font-size: 1.6rem;
+    margin: 0 0 1rem;
+    padding-bottom: .4rem;
+    border-bottom: 3px solid var(--honey);
+    display: inline-block;
+    color: var(--ink);
+  }
+  h3 {
+    font-size: 1.2rem;
+    margin: 2rem 0 .6rem;
+    color: var(--honey-deep);
+  }
+  h4 { font-size: 1.02rem; margin: 1.4rem 0 .4rem; color: var(--ink-soft); }
+
+  p, li { color: var(--ink); }
+  a { color: var(--honey-deep); }
+
+  code {
+    font-family: var(--mono);
+    background: var(--cream-2);
+    padding: .1rem .4rem;
+    border-radius: 6px;
+    font-size: .88em;
+    color: var(--honey-deep);
+  }
+  pre {
+    background: #2a2016;
+    color: #f3e7d2;
+    padding: 1.1rem 1.3rem;
+    border-radius: var(--radius);
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: .82rem;
+    line-height: 1.5;
+    box-shadow: var(--shadow);
+  }
+  pre code { background: none; color: inherit; padding: 0; }
+
+  /* ---------- Cards / callouts ---------- */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.4rem 1.6rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.4rem;
+  }
+
+  .callout {
+    border-radius: 10px;
+    padding: .9rem 1.1rem .9rem 1.2rem;
+    margin: 1.1rem 0;
+    border-left: 5px solid;
+    font-size: .94rem;
+  }
+  .callout p { margin: .3rem 0; }
+  .callout.note { background: var(--note); border-color: var(--honey); }
+  .callout.info { background: var(--info-bg); border-color: var(--info-line); }
+  .callout.ok   { background: var(--ok-bg);  border-color: var(--ok-line); }
+  .callout.warn { background: var(--warn-bg); border-color: var(--warn-line); }
+  .callout.stop { background: var(--stop-bg); border-color: var(--stop-line); }
+  .callout .lbl { font-weight: 700; }
+
+  .todo {
+    background: var(--cream-2);
+    border: 1px dashed var(--honey-dark);
+    border-radius: 8px;
+    padding: .5rem .8rem;
+    margin: .8rem 0;
+    font-size: .88rem;
+    color: var(--ink-soft);
+  }
+  .todo::before { content: "✎ noch zu ergänzen: "; font-weight: 700; color: var(--honey-deep); }
+
+  /* ---------- Tables ---------- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0 1.4rem;
+    font-size: .9rem;
+    background: var(--card);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  th, td { padding: .6rem .8rem; text-align: left; border-bottom: 1px solid var(--line); }
+  th { background: var(--cream-2); color: var(--ink); font-weight: 700; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fffdf8; }
+
+  /* ---------- Images ---------- */
+  figure { margin: 1.4rem 0; }
+  figure img {
+    width: 100%;
+    max-width: 520px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    display: block;
+    border: 1px solid var(--line);
+  }
+  figure figcaption {
+    font-size: .82rem;
+    color: var(--ink-soft);
+    margin-top: .5rem;
+    font-style: italic;
+  }
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+  .gallery figure { margin: 0; }
+  .gallery img { max-width: 100%; }
+
+  ul.checklist { list-style: none; padding-left: 0; }
+  ul.checklist li { padding: .25rem 0 .25rem 1.8rem; position: relative; }
+  ul.checklist li::before {
+    content: "☐";
+    position: absolute; left: 0;
+    color: var(--honey-dark);
+    font-size: 1.1rem;
+  }
+
+  .steps { counter-reset: step; list-style: none; padding-left: 0; }
+  .steps > li {
+    counter-increment: step;
+    position: relative;
+    padding: .3rem 0 .9rem 2.6rem;
+  }
+  .steps > li::before {
+    content: counter(step);
+    position: absolute; left: 0; top: .1rem;
+    width: 1.8rem; height: 1.8rem;
+    background: var(--honey);
+    color: #fff;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-weight: 700; font-size: .85rem;
+    box-shadow: 0 2px 6px rgba(217,135,15,.4);
+  }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 1.5rem;
+    margin-top: 2rem;
+    font-size: .85rem;
+    color: var(--ink-soft);
+  }
+
+  .back-top {
+    position: fixed;
+    right: 1.4rem; bottom: 1.4rem;
+    background: var(--honey);
+    color: #fff;
+    border: none;
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    display: none;
+  }
+
+  /* ---------- Responsive ---------- */
+  .menu-btn { display: none; }
+  @media (max-width: 880px) {
+    nav.side {
+      position: fixed;
+      left: 0; top: 0;
+      transform: translateX(-100%);
+      transition: transform .25s ease;
+      z-index: 50;
+    }
+    nav.side.open { transform: translateX(0); }
+    main { padding: 1.5rem 1.2rem 4rem; }
+    .menu-btn {
+      display: inline-flex;
+      position: fixed; top: 1rem; left: 1rem; z-index: 60;
+      background: var(--honey); color: #fff; border: none;
+      width: 44px; height: 44px; border-radius: 10px;
+      font-size: 1.3rem; cursor: pointer; box-shadow: var(--shadow);
+      align-items: center; justify-content: center;
+    }
+    .hero h1 { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<button class="menu-btn" onclick="document.querySelector('nav.side').classList.toggle('open')">☰</button>
+
+<div class="wrap">
+  <nav class="side">
+    <div class="brand">
+      <span class="logo">🐝</span>
+      <div>
+        <span>Nachbau-Doku</span>
+        <h1>Imker-Waage</h1>
+      </div>
+    </div>
+    <ul>
+      <li><a href="#ueberblick">Überblick</a></li>
+      <li><a href="#hardware">1 · Hardware &amp; Platinen</a></li>
+      <li><a href="#deckel" class="sub">Deckel-Platine</a></li>
+      <li><a href="#haupt" class="sub">Hauptplatine</a></li>
+      <li><a href="#umgebung" class="sub">Umgebungsplatine</a></li>
+      <li><a href="#fertigung">2 · Fertigung (JLCPCB)</a></li>
+      <li><a href="#loeten" class="sub">Löten</a></li>
+      <li><a href="#strom">3 · Stromversorgung</a></li>
+      <li><a href="#bestromen" class="sub">Erstes Bestromen</a></li>
+      <li><a href="#software">4 · Software (ESPHome)</a></li>
+      <li><a href="#flashen" class="sub">Flashen &amp; Hotspot</a></li>
+      <li><a href="#thingspeak" class="sub">ThingSpeak</a></li>
+      <li><a href="#kalibrieren" class="sub">Kalibrierung</a></li>
+      <li><a href="#montage">5 · Montage &amp; Betrieb</a></li>
+      <li><a href="#status">Status / offen</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="hero" id="top">
+      <span class="tag">🍯 Für Imker zum Nachbau</span>
+      <h1>Imker-Waage (Stockwaage)</h1>
+      <p>Selbst entwickelte Bienenstock-Waage auf ESP32-Basis: Gewicht, Umweltwerte und
+         Energie im Blick – Daten per WLAN (ThingSpeak) und LoRa.</p>
+    </div>
+
+    <!-- ÜBERBLICK -->
+    <section id="ueberblick">
+      <h2>Überblick</h2>
+      <p>Die Waage misst laufend das <strong>Gewicht</strong> eines Bienenstocks sowie
+         weitere <strong>Umweltwerte</strong> und überträgt die Daten per <strong>WLAN</strong>
+         (an ThingSpeak) und <strong>LoRa</strong>. Als Software kommt <strong>ESPHome</strong>
+         zum Einsatz. Die Platinen sind ein eigenes Design und bei
+         <strong>JLCPCB</strong> nachbestellbar.</p>
+
+      <div class="callout info">
+        <p><span class="lbl">ℹ️ Hinweis:</span> Diese Doku entstand u. a. während eines
+        Imker-Workshops. Noch offene Stellen sind als <em>„noch zu ergänzen"</em> markiert.</p>
+      </div>
+
+      <table>
+        <tr><th>Eigenschaft</th><th>Wert</th></tr>
+        <tr><td>Controller</td><td>ESP32 (zwei Footprint-Varianten möglich)</td></tr>
+        <tr><td>Gewicht</td><td>2× Wägesensoren über 2× HX711</td></tr>
+        <tr><td>Umwelt</td><td>BME280 (Temp./Feuchte/Druck), BMP280 (Temp./Druck), bis 3× DS18B20, Mikrofon, BH1750 (Helligkeit)</td></tr>
+        <tr><td>Energie</td><td>INA219 (Spannung &amp; Strom Batterie/Solar)</td></tr>
+        <tr><td>Datenübertragung</td><td>WLAN → ThingSpeak, zusätzlich LoRa</td></tr>
+        <tr><td>Software</td><td>ESPHome (eigene Konfiguration)</td></tr>
+        <tr><td>Stromversorgung</td><td>Akku/Netzteil 6–40 V, Solarmodul bis 30 W / max. 40 V</td></tr>
+        <tr><td>Platinen</td><td>Eigenes Design, nachbestellbar bei JLCPCB</td></tr>
+        <tr><td>Schutz</td><td>Nur über Außengehäuse (kein separater Diebstahlschutz)</td></tr>
+      </table>
+
+      <figure>
+        <img src="images/uebersicht-alle-teile.jpeg" alt="Übersicht aller Bauteile des Bausatzes" loading="lazy" />
+        <figcaption>Übersicht aller Bauteile des Bausatzes.</figcaption>
+      </figure>
+    </section>
+
+    <!-- HARDWARE -->
+    <section id="hardware">
+      <h2>1 · Hardware &amp; Platinen</h2>
+      <p>Herzstück ist ein <strong>ESP32</strong>, der die Sensoren ausliest und die Daten
+         per WLAN und LoRa überträgt. Das System besteht aus drei eigenen Platinen, die über
+         ein <strong>RJ45-Kabel</strong> verbunden sind.</p>
+
+      <table>
+        <tr><th>Platine</th><th>Einbauort</th><th>Bestückung (Auszug)</th></tr>
+        <tr><td>Deckel-Platine (<code>DECKEL_PCBee</code>)</td><td>Gehäusedeckel</td><td>Mikrofon, BME280, 3× DS18B20-Klemmen (Temp1–Temp3), RJ45</td></tr>
+        <tr><td>Hauptplatine (<code>BASIS-PCBee</code>)</td><td>Außengehäuse</td><td>ESP32, 2× HX711, BMP280, INA219, Netzteile, Stromanschlüsse</td></tr>
+        <tr><td>Umgebungsplatine (<code>UMGEBUNGS_PCBee</code>)</td><td><em>noch zu ergänzen</em></td><td>BH1750 (Helligkeit) + weiterer Sensor-Steckplatz, RJ45</td></tr>
+      </table>
+
+      <div class="callout warn">
+        <p><span class="lbl">⚠️ RJ45 ≠ Ethernet:</span> Der RJ45-Stecker wird nur als robuste
+        Steckverbindung genutzt – darüber laufen Stromversorgung und Sensor-/Bussignale,
+        es ist <strong>kein Netzwerk</strong>.</p>
+      </div>
+
+      <h3 id="deckel">Deckel-Platine (<code>DECKEL_PCBee</code>)</h3>
+      <ul>
+        <li><strong>Mikrofon</strong> (M1) – Stockgeräusche; Modul mit einstellbarer Verstärkung</li>
+        <li><strong>BME280</strong> (M2) – Temperatur, Luftfeuchte, Luftdruck (I²C)</li>
+        <li><strong>Bis 3× DS18B20</strong> – Temperatur (1-Wire), Klemmen <code>Temp1</code>, <code>Temp2</code>, <code>Temp3</code></li>
+        <li><strong>RJ45-Buchse</strong> – Verbindung zur Hauptplatine</li>
+      </ul>
+      <figure>
+        <img src="images/deckelplatine-mikrofon-fertig.jpeg" alt="Fertig bestückte Deckel-Platine" loading="lazy" />
+        <figcaption>Fertig bestückte Deckel-Platine mit BME280, Mikrofon, RJ45 und den Temp-Klemmen.</figcaption>
+      </figure>
+
+      <h3 id="haupt">Hauptplatine (<code>BASIS-PCBee</code>)</h3>
+      <ul>
+        <li><strong>ESP32</strong> – Steuerung &amp; WLAN; Platine unterstützt zwei Modul-Breiten (Footprints)</li>
+        <li><strong>2× HX711</strong> – Wägeverstärker für die Gewichtsmessung</li>
+        <li><strong>BMP280</strong> – Temperatur/Luftdruck, auf der <strong>Rückseite</strong></li>
+        <li><strong>INA219</strong> – Spannung &amp; Strom von Batterie und Solar</li>
+        <li><strong>2 Netzteile (LM2596S)</strong>, Schraubklemmen <code>SOL</code>/<code>BAT</code>/<code>SRV</code>, Sicherungen F1/F2 (3,15 A), USB-A (5-V-Ausgang)</li>
+      </ul>
+
+      <div class="callout note">
+        <p><span class="lbl">🔌 ESP32-Footprints:</span> Es wird nur <strong>eine</strong>
+        der beiden Modul-Varianten (breit/schmal) bestückt – passend zum vorhandenen Modul.
+        Die andere Position bleibt frei.</p>
+      </div>
+
+      <h4>Wägesensoren &amp; HX711</h4>
+      <p>Die Wägesensoren werden über die HX711 ausgewertet. Die Anschluss-Klemmen heißen
+         <code>Waage1</code> und <code>Waage2</code> und liegen nahe den HX711.</p>
+      <div class="callout ok">
+        <p><span class="lbl">✅ Welche Wägezelle?</span> Grundsätzlich funktionieren
+        <strong>alle gängigen Wägezellen</strong> – sie sind austauschbar. Entscheidend ist
+        die <strong>Kalibrierung</strong> nach dem Einbau.</p>
+      </div>
+      <div class="todo">genauer Sensortyp, Belastbarkeit (kg), Verschaltung und Pinbelegung.</div>
+
+      <h4>BMP280 auf der Rückseite</h4>
+      <div class="callout info">
+        <p><span class="lbl">ℹ️ Nicht verwechseln:</span> Der <strong>BMP280</strong>
+        (Hauptplatine, Rückseite) misst Temperatur/Luftdruck – der <strong>BME280</strong>
+        (Deckel) zusätzlich die Luftfeuchte.</p>
+      </div>
+      <figure>
+        <img src="images/hauptplatine-von-unten.jpeg" alt="Rückseite der Hauptplatine" loading="lazy" />
+        <figcaption>Rückseite der Hauptplatine (hier sitzt der BMP280).</figcaption>
+      </figure>
+
+      <h4>Sicherungen &amp; USB-A</h4>
+      <p>Zwei Feinsicherungen <strong>F1/F2 (je 3,15 A, 5×20 mm)</strong> begrenzen den Strom
+         und verhindern Folgeschäden z. B. bei defektem Netzteil. Die <strong>USB-A-Buchse</strong>
+         ist ein reiner <strong>5-V-Ausgang</strong> (keine Daten) – praktisch z. B. zur
+         Versorgung eines <strong>LTE-Hotspots</strong> an Standorten ohne WLAN.</p>
+
+      <h3 id="umgebung">Umgebungsplatine (<code>UMGEBUNGS_PCBee</code>)</h3>
+      <ul>
+        <li><strong>BH1750</strong> – Helligkeit (Lichtstärke, I²C)</li>
+        <li>weiterer <strong>Sensor-Steckplatz</strong> <em>(noch zu ergänzen)</em></li>
+        <li><strong>RJ45-Buchse</strong></li>
+      </ul>
+      <figure>
+        <img src="images/umgebungsplatine-1.jpeg" alt="Umgebungsplatine mit BH1750" loading="lazy" />
+        <figcaption>Umgebungsplatine mit BH1750-Helligkeitssensor und zweitem Sensor-Steckplatz.</figcaption>
+      </figure>
+
+      <h3>Blockschaltbild</h3>
+      <pre><code>         [ Deckel-Platine (DECKEL_PCBee) ]
+   Mikrofon · BME280 · 3× DS18B20 (Temp1–Temp3)
+                     |
+                   RJ45
+                     |
+         [ Hauptplatine (BASIS-PCBee) ]
+   ESP32 · 2× HX711 (Waage1/Waage2) · BMP280 · INA219 · LoRa
+         |                              |
+   Stromversorgung                  Funk: WLAN + LoRa
+ (SOL / BAT / SRV)                 (WLAN → ThingSpeak)
+                     |
+                   RJ45
+                     |
+       [ Umgebungsplatine (UMGEBUNGS_PCBee) ]
+         BH1750 (Helligkeit) · (weiterer Sensor)</code></pre>
+    </section>
+
+    <!-- FERTIGUNG -->
+    <section id="fertigung">
+      <h2>2 · Platinen-Fertigung (JLCPCB)</h2>
+      <p>Die Platinen können bei <a href="https://jlcpcb.com/" target="_blank" rel="noopener">JLCPCB</a>
+         nachbestellt werden. Jede Platine (Deckel, Haupt, Umgebung) wird mit ihren
+         <strong>eigenen Gerber-Dateien</strong> separat bestellt.</p>
+
+      <div class="callout note">
+        <p><span class="lbl">📁 Ablage der Dateien:</span> Gerber unter
+        <code>hardware/gerber/</code>, Stücklisten (BOM, Excel) unter <code>hardware/bom/</code>,
+        Schaltpläne unter <code>hardware/schaltplan/</code>. <em>(Dateien werden noch hinzugefügt.)</em></p>
+      </div>
+
+      <h3>Beschriftung auf der Platine</h3>
+      <div class="callout ok">
+        <p><span class="lbl">✅ Eindeutig gekennzeichnet:</span> Die Platine ist durchgängig
+        bedruckt – es ist klar, welches Bauteil an welche Position gehört, inkl. Einbaurichtung
+        bei gepolten Bauteilen. Im Zweifel mit Schaltplan und BOM abgleichen.</p>
+      </div>
+
+      <h3>Lötzinn</h3>
+      <table>
+        <tr><th>Typ</th><th>Eigenschaft</th></tr>
+        <tr><td>Bleihaltig</td><td>einfacher zu löten, aber <strong>gewerblich nicht erlaubt</strong> (RoHS)</td></tr>
+        <tr><td>Bleifrei</td><td>RoHS-konform, gewerblich vorgeschrieben, etwas anspruchsvoller</td></tr>
+      </table>
+
+      <h3>Bauteile mit und ohne Einbaurichtung</h3>
+      <ul>
+        <li><strong>Dioden:</strong> gepolt. Schwarzer Ring (Minus/Kathode) muss auf den
+            weißen Ring der Platine zeigen. Es gibt verschiedene Diodentypen – Aufdruck beachten.</li>
+        <li><strong>LEDs:</strong> gepolt. Abgeschrägte Seite der LED = abgeschrägte Markierung auf der Platine.</li>
+        <li><strong>Widerstände:</strong> Richtung egal.</li>
+        <li><strong>Netzteile (LM2596S):</strong> <code>IN</code>/<code>OUT</code> auf Modul und Platine müssen zusammenpassen.</li>
+      </ul>
+
+      <div class="callout warn">
+        <p><span class="lbl">⚠️ Beim Löten:</span> Keine Lötbrücken zwischen Pins (danach
+        prüfen). Lötdampf nicht einatmen – für Belüftung bzw. Absaugung sorgen.</p>
+      </div>
+
+      <h3 id="loeten">Löten in der Praxis</h3>
+      <div class="gallery">
+        <figure><img src="images/loeten-deckelplatine.jpeg" alt="Löten der Deckel-Platine" loading="lazy" /><figcaption>Löten der Deckel-Platine.</figcaption></figure>
+        <figure><img src="images/loeten-mikrofon-1.jpeg" alt="Einlöten des Mikrofons" loading="lazy" /><figcaption>Mikrofon unter der Lupenleuchte.</figcaption></figure>
+        <figure><img src="images/loeten-mikrofon-2.jpeg" alt="Löten am Sensorbereich" loading="lazy" /><figcaption>Löten am Sensorbereich (Pinzette).</figcaption></figure>
+        <figure><img src="images/loeten-netzteil-1.jpeg" alt="Löten eines Netzteil-Moduls" loading="lazy" /><figcaption>Netzteil-Modul auf der Hauptplatine.</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- STROM -->
+    <section id="strom">
+      <h2>3 · Stromversorgung</h2>
+      <p>Die Waage ist für den Dauerbetrieb im Außenbereich ausgelegt und kann mit Akku,
+         Netzteil und/oder Solar versorgt werden. Alle Anschlüsse sitzen auf der Hauptplatine.</p>
+
+      <table>
+        <tr><th>Quelle</th><th>Spannung / Leistung</th></tr>
+        <tr><td>Externer Akku</td><td>6–40 V</td></tr>
+        <tr><td>Netzteil</td><td>6–40 V</td></tr>
+        <tr><td>Solarmodul</td><td>bis 30 W, max. 40 V</td></tr>
+      </table>
+
+      <h3>Netzteile (DC-DC LM2596S)</h3>
+      <p>Zwei einstellbare Abwärtswandler: ein <strong>Laderegler</strong> (rechtes Netzteil,
+         nur bei Solar nötig) und die <strong>Versorgung</strong> für den Rest der Platine.
+         Beide über Stiftleisten angelötet, <code>IN</code>/<code>OUT</code> beachten.</p>
+
+      <div class="callout stop">
+        <p><span class="lbl">🛑 Spannungen VOR dem ESP32-Einbau einstellen!</span>
+        Batteriespannung <strong>14,3 V</strong> und 5-V-Versorgung auf <strong>genau 5,0 V</strong>
+        einstellen und messen. Zu hohe Spannung kann den Controller zerstören.</p>
+      </div>
+
+      <h3 id="bestromen">Erstes Bestromen &amp; Spannungen einstellen</h3>
+      <ol class="steps">
+        <li><strong>Spannung anlegen</strong> an <code>SOL</code> (Solar +/−), zum Einstellen 16–40 V (z. B. Werkzeugakku). Polung beachten.</li>
+        <li><strong>Messheader</strong> unter dem ESP32 nutzen: <code>Vsol</code>, <code>Vbat</code>, <code>3V3</code>, <code>5V0</code>, <code>GND</code>. GND = Minus (schwarz).</li>
+        <li><strong>Batteriespannung 14,3 V</strong> am rechten Netzteil-Poti einstellen (rechtsrum höher, mehrere Umdrehungen) – nur bei Solar.</li>
+        <li><strong>5-V-Versorgung</strong> auf genau 5,0 V einstellen.</li>
+        <li><strong>5-V-Lötbrücke schließen</strong> – erst nachdem die Spannungen stimmen.</li>
+        <li><strong>ESP32 aufstecken</strong> und am Messpunkt <code>3V3</code> die 3,3 V prüfen.</li>
+      </ol>
+
+      <div class="callout info">
+        <p><span class="lbl">ℹ️ Warum 16–40 V zum Einstellen?</span> Im Betrieb genügen 6–40 V.
+        Zum Einstellen am Solar-Eingang wird eine höhere Mindestspannung (ab 16 V) genutzt,
+        damit der Laderegler die 14,3 V sicher ausregelt.</p>
+      </div>
+
+      <div class="gallery">
+        <figure><img src="images/einstellung-netzteil-spannungsmessung-1.jpeg" alt="Spannungsmessung am Messheader" loading="lazy" /><figcaption>Messung am Messheader.</figcaption></figure>
+        <figure><img src="images/einstellung-netzteil-potentiometer-1.jpeg" alt="Batteriespannung am Poti einstellen" loading="lazy" /><figcaption>Batteriespannung (14,3 V) einstellen.</figcaption></figure>
+        <figure><img src="images/einstellung-netzteil-potentiometer-2.jpeg" alt="5-V-Spannung einstellen" loading="lazy" /><figcaption>5-V-Versorgung einstellen.</figcaption></figure>
+        <figure><img src="images/einstellung-netzteil-spannungsmessung-2.jpeg.jpeg" alt="Multimeter zeigt rund 5 V" loading="lazy" /><figcaption>Kontrolle: rund 5 V.</figcaption></figure>
+        <figure><img src="images/hauptplatine-loetbruecke-nach-spannungskonfiguration.jpeg" alt="Geschlossene 5-V-Lötbrücke" loading="lazy" /><figcaption>5-V-Lötbrücke geschlossen.</figcaption></figure>
+      </div>
+
+      <h3>Anschlüsse &amp; Schutz</h3>
+      <table>
+        <tr><th>Aufdruck</th><th>Klemme</th><th>Anschluss für</th></tr>
+        <tr><td><code>SOL</code></td><td>Solar</td><td>Solarmodul (bis 30 W / max. 40 V)</td></tr>
+        <tr><td><code>BAT</code></td><td>Batterie</td><td>Akku / Batterie (bzw. Netzteil, 6–40 V)</td></tr>
+        <tr><td><code>SRV</code></td><td>Wartungsschalter</td><td>stromlos Schalten bei Wartung</td></tr>
+      </table>
+      <p>Überwachung über den <strong>INA219</strong> (Batterie-/Solarspannung und Strom).
+         Zwei Sicherungen <strong>F1/F2 (3,15 A)</strong> begrenzen den Strom.</p>
+    </section>
+
+    <!-- SOFTWARE -->
+    <section id="software">
+      <h2>4 · Software (ESPHome)</h2>
+      <p>Die Firmware basiert auf <a href="https://esphome.io/" target="_blank" rel="noopener">ESPHome</a>
+         und lässt sich per OTA aktualisieren. Sie liest alle Sensoren aus und sendet die
+         Daten per WLAN an ThingSpeak (zusätzlich LoRa).</p>
+
+      <div class="callout note">
+        <p><span class="lbl">📦 Software auf GitHub:</span> Firmware und die Anleitung zum
+        <strong>ESP Web Flasher</strong> liegen in einem GitHub-Repository.
+        <em>(Link wird noch nachgereicht.)</em></p>
+      </div>
+
+      <h3 id="flashen">Flashen &amp; Erstkonfiguration</h3>
+      <div class="callout warn">
+        <p><span class="lbl">⚠️ Richtige Buchse:</span> Geflasht wird über die
+        <strong>USB-Buchse am ESP32-DevKit</strong> – <strong>nicht</strong> über die
+        USB-A-Buchse der Platine (die führt nur 5 V).</p>
+      </div>
+      <ol class="steps">
+        <li>Rechner (Browser mit Web Serial, z. B. Chrome/Edge) per USB mit dem ESP32-DevKit verbinden.</li>
+        <li>GitHub-Repo öffnen und der <strong>ESP-Web-Flasher</strong>-Anleitung folgen.</li>
+        <li>Nach dem Flashen startet die Waage einen WLAN-Hotspot <code>smartebeute</code> (ohne Passwort).</li>
+        <li>Mit dem Hotspot verbinden → im Portal das eigene WLAN auswählen und Zugangsdaten eingeben.</li>
+        <li>Danach ist die Waage im eigenen Netz erreichbar unter <a href="http://smartebeute.local">http://smartebeute.local</a> (OTA-Updates möglich).</li>
+      </ol>
+
+      <h3 id="thingspeak">Daten an ThingSpeak</h3>
+      <p>Die Messwerte gehen an <a href="https://thingspeak.com/" target="_blank" rel="noopener">ThingSpeak</a>
+         (kostenloses Konto, 4 Channels).</p>
+      <ol class="steps">
+        <li>Konto anlegen und <strong>zwei Channels</strong> erstellen: einen für die <strong>Beute</strong> (Gewicht), einen für die <strong>Umgebungswerte</strong>.</li>
+        <li>Von beiden Channels den <strong>Write-Key</strong> notieren.</li>
+        <li>Die Write-Keys in der smartebeute-Weboberfläche eintragen.</li>
+      </ol>
+      <div class="callout info">
+        <p><span class="lbl">ℹ️ Kein Speichern-Knopf:</span> Die Write-Keys sind sofort nach
+        dem Einfügen gespeichert.</p>
+      </div>
+
+      <h3 id="kalibrieren">Wägezelle anschließen &amp; Kalibrierung</h3>
+      <p>Die Wägezelle hat <strong>4 Kabel</strong> → Klemmen <code>Waage1</code>/<code>Waage2</code>
+         (nahe HX711). Die richtige Belegung durch <strong>Ausprobieren</strong> finden:</p>
+      <div class="callout ok">
+        <p><span class="lbl">✅ Richtig angeschlossen,</span> wenn die <strong>Rohwerte bei
+        Belastung steigen</strong>. Hier wird noch <strong>kein</strong> korrektes Gewicht
+        angezeigt – das kommt erst mit der Kalibrierung.</p>
+      </div>
+      <div class="callout warn">
+        <p><span class="lbl">⚠️ Farben variieren:</span> Die Farbcodierung der Wägezellen ist
+        <strong>nicht einheitlich</strong> und unterscheidet sich oft je Hersteller. Immer
+        per steigenden Rohwerten bestätigen.</p>
+      </div>
+      <p>Beispiel einer getesteten Zelle (von oben nach unten, beginnend an der LED) –
+         <strong>nur für diese eine Zelle</strong>, kein allgemeiner Standard:</p>
+      <table>
+        <tr><th>Reihenfolge (an der LED beginnend)</th><th>Kabelfarbe</th></tr>
+        <tr><td>1 (oben)</td><td>Rot</td></tr>
+        <tr><td>2</td><td>Schwarz</td></tr>
+        <tr><td>3</td><td>Weiß</td></tr>
+        <tr><td>4 (unten)</td><td>Blau</td></tr>
+      </table>
+      <p>Kalibrierung über zwei Referenzpunkte:</p>
+      <ol class="steps">
+        <li><strong>0 kg</strong> (ohne Last) erfassen.</li>
+        <li><strong>10 kg</strong> (bekanntes Gewicht) auflegen und erfassen.</li>
+        <li>Die Software berechnet daraus die Umrechnung – danach stimmt das Gewicht.</li>
+      </ol>
+    </section>
+
+    <!-- MONTAGE -->
+    <section id="montage">
+      <h2>5 · Montage &amp; Betrieb</h2>
+
+      <h3>Inbetriebnahme (Reihenfolge)</h3>
+      <ol class="steps">
+        <li>Platinen bestücken – ESP32 noch <strong>nicht</strong> einsetzen.</li>
+        <li>Spannungen einstellen (14,3 V / 5,0 V), dann 5-V-Lötbrücke schließen.</li>
+        <li>ESP32 aufstecken, 3,3 V prüfen.</li>
+        <li>ESP32 flashen (ESP Web Flasher).</li>
+        <li>Mit Hotspot <code>smartebeute</code> verbinden, WLAN + ThingSpeak einrichten.</li>
+        <li>Platinen per RJ45 verbinden, Wägezelle an Waage1/Waage2 (Belegung ausprobieren).</li>
+        <li>Waage kalibrieren (0 kg / 10 kg).</li>
+        <li>Datenübertragung prüfen, erste Messwerte kontrollieren.</li>
+      </ol>
+
+      <h3>Wetterschutz, Diebstahl &amp; Verschmutzung</h3>
+      <div class="callout warn">
+        <p><span class="lbl">⚠️ Häufige Imker-Frage:</span> Die Elektronik hat
+        <strong>keinen</strong> eigenen Schutz gegen Diebstahl oder Verschmutzung. Der Schutz
+        erfolgt ausschließlich über das <strong>Außengehäuse</strong> (Witterungsschutz).
+        Ein Diebstahlschutz (Alarm/GPS) müsste separat ergänzt werden.</p>
+      </div>
+      <ul>
+        <li>Gehäuse so montieren, dass kein Spritz-/Stauwasser eindringt; Kabeldurchführungen nach unten und abgedichtet.</li>
+        <li>RJ45-Verbindung und Klemmen vor Feuchtigkeit schützen.</li>
+        <li>Regelmäßig auf Verschmutzung (Sensoren, Solarmodul) und festen Sitz prüfen.</li>
+      </ul>
+
+      <h3>Wartung</h3>
+      <ul>
+        <li>Akku-/Ladezustand im Blick behalten (besonders Solar im Winter).</li>
+        <li>Sensoren und Solarmodul sauber halten.</li>
+        <li>Nach Eingriffen am Stock prüfen, ob die Waage korrekt misst (ggf. neu kalibrieren).</li>
+      </ul>
+    </section>
+
+    <!-- STATUS -->
+    <section id="status">
+      <h2>Status / noch zu klären</h2>
+      <div class="card">
+        <ul class="checklist">
+          <li>Typ und Belastbarkeit der Wägesensoren</li>
+          <li>Umgebungsplatine: zweiter Sensor-Steckplatz (neben BH1750) und Einbauort</li>
+          <li>LoRa: Funkmodul und Zielsystem (z. B. TTN / eigenes Gateway)</li>
+          <li>Gerber-Dateien, BOM-Excel und Schaltpläne ablegen (je Platine)</li>
+          <li>GitHub-Link zur Firmware (inkl. ESP-Web-Flasher-Anleitung)</li>
+          <li>Gehäuse/Schutzart und Lizenz des Projekts</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer>
+      🐝 Imker-Waage · Nachbau-Dokumentation · für Imkerinnen und Imker zum Selbstbau.
+      Diese Seite ist eine Zusammenfassung der ausführlichen Doku im Ordner <code>docs/</code>.
+    </footer>
+  </main>
+</div>
+
+<button class="back-top" id="backTop" title="Nach oben" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  // Back-to-top button
+  var btn = document.getElementById('backTop');
+  window.addEventListener('scroll', function () {
+    btn.style.display = window.scrollY > 500 ? 'block' : 'none';
+  });
+  // Close mobile menu after clicking a link
+  document.querySelectorAll('nav.side a').forEach(function (a) {
+    a.addEventListener('click', function () {
+      document.querySelector('nav.side').classList.remove('open');
+    });
+  });
+</script>
+</body>
+</html>
