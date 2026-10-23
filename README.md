@@ -53,15 +53,6 @@ Die zugehörigen Dateien liegen in diesem Repository:
 - [`hardware/schaltplan/`](hardware/schaltplan/) – Schaltpläne (PDF) je Platine
 - [`hardware/bom/`](hardware/bom/) – Stückliste (`BOM-Bienenbeute.xlsx`)
 
-## Status / noch zu klären
-
-- [ ] Umgebungsplatine: zweiter Sensor-Steckplatz (neben BH1750) und Einbauort
-- [x] Gerber-Dateien in `hardware/gerber/` abgelegt (je Platine)
-- [x] BOM in `hardware/bom/` abgelegt (`BOM-Bienenbeute.xlsx`)
-- [x] Schaltpläne in `hardware/schaltplan/` abgelegt (je Platine)
-- [x] Firmware/ESPHome-Konfiguration in `software/` abgelegt
-- [ ] Link zu weiteren Design-Dateien (Gehäuse)
-
 ## Hinweis: Kabelbelegung der Wägezelle
 
 Die **Farbcodierung der Wägezellen ist nicht einheitlich** und unterscheidet sich oft je
