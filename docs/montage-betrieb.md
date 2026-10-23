@@ -58,7 +58,8 @@ den HX711 auf der Hauptplatine).
    [Stromversorgung → Erstes Bestromen und Spannungen einstellen](stromversorgung.md#erstes-bestromen-und-spannungen-einstellen)).
 3. Erst **danach den ESP32 aufstecken** und am Messpunkt **3,3 V** prüfen (Kontrolle, dass
    der Controller korrekt versorgt wird).
-4. ESP32 **flashen** – per **ESP Web Flasher** gemäß Anleitung im GitHub-Repo (siehe
+4. ESP32 **flashen** – ESPHome-Konfiguration `software/smarterBienenstock.yaml` aufspielen
+   (per ESP Web Flasher / ESPHome, siehe
    [Software](software.md#erstes-flashen-esp-web-flasher)).
 5. Mit dem WLAN-Hotspot **`smartebeute`** (ohne Passwort) verbinden und die Waage
    **einrichten** (WLAN + ThingSpeak, siehe
@@ -69,7 +70,7 @@ den HX711 auf der Hauptplatine).
    [Software → Wägezelle anschließen](software.md#wägezelle-anschließen-4-kabel)).
 7. Waage **kalibrieren** (0 kg / 10 kg, siehe
    [Software → Kalibrierung](software.md#kalibrierung-der-waage)).
-8. Datenübertragung (WLAN an ThingSpeak, LoRa) prüfen.
+8. Datenübertragung (WLAN an ThingSpeak) prüfen.
 9. Erste Messwerte kontrollieren.
 
 ## Wartung

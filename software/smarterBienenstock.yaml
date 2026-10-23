@@ -1,0 +1,478 @@
+# ic2 PCB sda:GPIO19 scl: GPIO18
+# ic2 Umgebung sda:GPIO25 scl: GPIO26
+# one wire 1 GPIO4
+# one wire 2 GPIO27
+# hx711  dout_pin: GPIO39 clk_pin: GPIO23
+# adc Microphone GPIO34
+# Service Schalter GPIO35
+# WLED GPIO33
+
+
+esphome:
+  name: smartebeute
+  project:
+    name: "emc2saar.smartebeute"
+    version: "0.5"
+  libraries:
+    - "arduinoFFT=https://github.com/kosme/arduinoFFT.git#v1.6.2"
+  includes:
+    - fft_include.h
+
+
+esp32:
+  board: az-delivery-devkit-v4
+  framework:
+    type: arduino
+
+wifi:
+  #ssid: !secret wifi_ssid
+  #password: !secret wifi_password
+  ap:
+
+improv_serial:
+    
+captive_portal:
+
+logger:
+
+api:
+
+web_server:
+  version: 3
+
+http_request:
+  verify_ssl: false
+  follow_redirects: true
+  watchdog_timeout: 30s
+  timeout: 10s
+
+ota:
+  platform: esphome
+
+i2c:
+  - id: i2c01
+    sda: GPIO19
+    scl: GPIO18
+    scan: true
+  - id: i2c02
+    sda: GPIO25
+    scl: GPIO26
+    scan: true
+  
+
+one_wire:
+  - platform: gpio
+    pin: GPIO4
+    id: onewire01
+  - platform: gpio
+    pin: GPIO27
+    id: onewire02
+
+sensor:
+  #- platform: adc
+  #  pin: GPIO34
+  #  name: "Mikrofone"
+  #  update_interval: 500ms
+
+  - platform: dallas_temp
+    name: "Temperatur Innen 01"
+    one_wire_id: onewire01
+    update_interval: 120s
+    id: temphonig
+
+  - platform: dallas_temp
+    name: "Temperatur Innen 02"
+    one_wire_id: onewire02
+    update_interval: 13s
+    id: tempbrut
+
+  - platform: bme280_i2c
+    temperature:
+      name: "BME280 Temperatur innen"
+      id: tempinnen
+    pressure:
+      name: "BME280 Druck innen"
+      id: druckinnen
+    humidity:
+      name: "BME280 Luftfeuchte innen"
+      id: feuchteinnen
+    address: 0x76
+    i2c_id: i2c01
+    update_interval: 13.5s
+
+  - platform: bmp280_i2c
+    temperature:
+      name: "BMP Temperatur PCB"
+      id: temppcb
+      oversampling: 16x
+    pressure:
+      name: "BMP Druck PCB"
+      id: druckpcb
+    address: 0x77    
+    i2c_id: i2c01
+    update_interval: 14.5s
+
+  - platform: bmp280_i2c
+    # variant: AHT20
+    address: 0x76 
+    temperature:
+      name: "BMP Temperatur Umgebung"
+      id: aussentemperatur
+    pressure:
+      name: "BMP Feuchte Druck"
+      id: aussendruck
+    update_interval: 16.8s  
+    i2c_id: i2c02
+
+  #- platform: bmp280_i2c
+  #  temperature:
+  #    name: "BMP Temperatur Umgebung"
+  #    oversampling: 16x
+  #  pressure:
+  #     name: "BMP Druck Umgebung"
+       #id: aussendruck
+  #  address: 0x76    
+  #  i2c_id: i2c02
+  #  update_interval: 11.5s
+
+  - platform: bh1750
+    name: "BH1750 Helligkeit"
+    id: helligkeit
+    address: 0x23
+    update_interval: 18.5s   
+    i2c_id: i2c02
+
+  - platform: hx711
+    name: "Waage1"
+    dout_pin: GPIO39
+    clk_pin: GPIO23
+    gain: 128
+    update_interval: 12.6s
+    id: waage1
+
+  - platform: ina219
+    shunt_resistance: 0.1 ohm
+    current:
+      name: "INA219 Strom"
+      id: strom
+    power:
+      name: "INA219 Leistung"
+      id: leistung
+    bus_voltage:
+      name: "INA219 Busspannung"
+      id: spannung
+    address: 0x40
+    i2c_id: i2c01
+    update_interval: 16.5s
+
+  - platform: template
+    name: "Waage1 Gewicht"
+    lambda: |-
+      if(id(waage1bei0).state != id(waage1bei10).state){
+        float m = (10.000)/(id(waage1bei10).state - id(waage1bei0).state);
+        float c = -(m * id(waage1bei0).state);
+        return m * id(waage1).state + c;
+      } else {
+        return 42.0;
+      }
+    update_interval: 5.8s
+    accuracy_decimals: 3
+    id: gewicht
+    
+  - platform: template
+    name: "Frequenz"
+    id: frequenz
+    update_interval: 10s
+    lambda: |-
+      float peak = 0;
+      float val = 0;
+      #define SAMPLES 128
+      #define SAMPLING_FREQUENCY 1212
+      
+      arduinoFFT FFT = arduinoFFT();
+      
+      unsigned int samplingPeriod;
+      
+      double vReal[SAMPLES]; //create vector of size SAMPLES to hold real values
+      double vImag[SAMPLES]; //create vector of size SAMPLES to hold imaginary values
+      
+      samplingPeriod = round(1000000*(1.0/SAMPLING_FREQUENCY)); //Period in microseconds
+      
+      for(int i=0; i<SAMPLES; i++) {
+          pinMode(34, INPUT);
+          val = analogRead(34);
+          vReal[i] = val; 
+          vImag[i] = 0;
+          
+          delayMicroseconds(samplingPeriod);
+      }
+      
+      FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+      FFT.Compute(vReal, vImag, SAMPLES, FFT_FORWARD);
+      FFT.ComplexToMagnitude(vReal, vImag, SAMPLES);
+      
+      peak = FFT.MajorPeak(vReal, SAMPLES, SAMPLING_FREQUENCY);
+      return peak;
+
+number:
+  - platform: template
+    name: "Waage1 bei 0kg"
+    id: waage1bei0
+    optimistic: true
+    min_value: 0
+    max_value: 2000000
+    step: 1
+    restore_value: true
+
+  - platform: template
+    name: "Waage1 bei 10kg"    
+    id: waage1bei10
+    optimistic: true
+    min_value: 0
+    max_value: 2000000
+    step: 1
+    restore_value: true
+
+button:
+  - platform: template
+    name: "Waage1 setzte 0kg"
+    on_press:
+      then:
+        - number.set:
+            id: waage1bei0
+            value: !lambda |-
+              return id(waage1).state; 
+
+  - platform: template
+    name: "Waage1 setzte 10kg"
+    on_press:
+      then:
+        - number.set:
+            id: waage1bei10
+            value: !lambda |-
+              return id(waage1).state; 
+
+binary_sensor:
+  - platform: gpio
+    id: serviceschalter
+    pin: GPIO35
+    name: "ServiceSchalter"
+    publish_initial_state: true
+    on_press:
+      then:
+        - light.turn_on:
+            effect: "None"
+            id: led
+            brightness: 50%
+            red: 100%
+            green: 0%
+            blue: 0%  
+
+
+    on_release:
+      then:
+        - light.turn_on:
+            effect: "None"
+            id: led
+            brightness: 50%
+            red: 0%
+            green: 0%
+            blue: 0%
+
+
+#switch:
+#  - platform: gpio
+#    pin: GPIO32
+#    id: ansteuerung3v3
+#    restore_mode: ALWAYS_ON
+
+light:
+  - platform: neopixelbus
+    type: RGB
+    variant: WS2812
+    pin: GPIO33
+    num_leds: 1
+    name: "Info LED"
+    id: led
+    effects:
+      - pulse:
+          name: "Fast Pulse"
+          transition_length: 0.5s
+          update_interval: 0.5s
+          min_brightness: 0%
+          max_brightness: 50%
+      - pulse:
+          name: "Pulse"
+          transition_length:
+            on_length: 1s
+            off_length: 1s
+          update_interval: 2s
+      - strobe:
+          name: Strobe
+          colors:
+            - state: true
+              brightness: 100%
+              red: 100%
+              green: 90%
+              blue: 0%
+              duration: 500ms
+            - state: false
+              duration: 250ms
+            - state: true
+              brightness: 100%
+              red: 0%
+              green: 100%
+              blue: 0%
+              duration: 500ms
+
+text:
+  - platform: template
+    name: Thinkspeak WriteKey Beute
+    id: keybeute
+    mode: password
+    restore_value: true
+    optimistic: true
+
+  - platform: template
+    name: Thinkspeak WriteKey Umgebung
+    id: keyumgebung
+    mode: password
+    restore_value: true
+    optimistic: true
+
+
+interval:
+  - interval: 61s
+    then:
+       - if:
+           condition: 
+             lambda: 'return id(serviceschalter).state == false;'
+           then:
+             - light.turn_on:
+                 id: led
+                 brightness: 50%
+                 red: 0%
+                 green: 0%
+                 blue: 0%
+
+             - http_request.post:
+                 url: "https://api.thingspeak.com/update"
+                 request_headers:
+                   Content-Type: application/json
+                 json:
+                   api_key: !lambda |-
+                     return id(keybeute).state;            
+                   field1: !lambda |-
+                     char buf[10];
+                     sprintf(buf, "%.3f", id(gewicht).state);
+                     return buf;              
+                   field2: !lambda |-
+                     char buf[10];
+                     sprintf(buf, "%.3f", id(frequenz).state);
+                     return buf;  
+                   field3: !lambda |-
+                     char buf[10];
+                     sprintf(buf, "%.1f", id(tempinnen).state);
+                     return buf;       
+                   field4: !lambda |-
+                     char buf[10];
+                     sprintf(buf, "%.1f", id(feuchteinnen).state);
+                     return buf;     	
+                   field5: !lambda |-
+                     char buf[10];
+                     sprintf(buf, "%.1f", id(tempbrut).state);
+                     return buf;     	
+                   field6: !lambda |-
+                     char buf[10];
+                     sprintf(buf, "%.1f", id(temphonig).state);
+                     return buf;
+                 on_response:
+                   then:
+                     - light.turn_on:
+                         effect: "None"
+                         id: led
+                         brightness: 50%
+                         red: 0%
+                         green: 100%
+                         blue: 0%
+                 on_error:
+                   then:
+                     - light.turn_on:
+                         effect: "None"
+                         id: led
+                         brightness: 50%
+                         red: 100%
+                         green: 100%
+                         blue: 0%
+
+  - interval: 60s
+    then:
+      - if:
+          condition: 
+            lambda: 'return id(serviceschalter).state == false;'
+          then:
+            - light.turn_on:
+                id: led
+                brightness: 50%
+                red: 0%
+                green: 0%
+                blue: 0%
+
+            - http_request.post:
+                url: "https://api.thingspeak.com/update"
+                request_headers:
+                  Content-Type: application/json
+                json:
+                  api_key: !lambda |-
+                    return id(keyumgebung).state;
+                  field1: !lambda |-
+                    char buf[10];
+                    sprintf(buf, "%.1f", id(helligkeit).state);
+                    return buf;   
+                  field2: !lambda |-
+                    char buf[10];
+                    sprintf(buf, "%.1f", id(aussentemperatur).state);
+                    return buf;            
+                  field3: !lambda |-
+                    char buf[10];
+                    sprintf(buf, "%.1f", id(aussendruck).state);
+                    return buf;               
+                  #field4: !lambda |-
+                  #  char buf[10];
+                  #  sprintf(buf, "%.1f", id(aussenfeuchte).state);
+                  #  return buf;           
+                  field5: !lambda |-
+                    char buf[10];
+                    sprintf(buf, "%.1f", id(spannung).state);
+                    return buf;            
+                  field6: !lambda |-
+                    char buf[10];
+                    sprintf(buf, "%.2f", id(leistung).state);
+                    return buf;            
+                  field7: !lambda |-
+                    char buf[10];
+                    sprintf(buf, "%.1f", id(temppcb).state);
+                    return buf;
+                on_response:
+                  then:
+                    - light.turn_on:
+                        effect: "None"
+                        id: led
+                        brightness: 50%
+                        red: 0%
+                        green: 100%
+                        blue: 0%
+                on_error:
+                  then:
+                    - light.turn_on:
+                        effect: "None"
+                        id: led
+                        brightness: 50%
+                        red: 100%
+                        green: 100%
+                        blue: 0%
+    
+    
+    
+
+

@@ -1,16 +1,16 @@
 # Stücklisten (BOM)
 
-Hier liegen die Stücklisten (Bill of Materials) der Platinen – in der Regel als
-Excel-Datei.
+Hier liegt die Stückliste (Bill of Materials) für ein komplettes Platinenset.
 
-Bitte Dateien nach folgendem Schema ablegen:
+| Datei                   | Inhalt                                               |
+| ----------------------- | ---------------------------------------------------- |
+| `BOM-Bienenbeute.xlsx`  | Alle Bauteile inkl. Bezugsquellen-Links und Preisen  |
 
-| Platine        | Dateiname (Vorschlag)        | Status               |
-| -------------- | ---------------------------- | -------------------- |
-| Deckel-Platine | `bom-deckel.xlsx`            | *(noch hinzufügen)*  |
-| Hauptplatine   | `bom-haupt.xlsx`             | *(noch hinzufügen)*  |
-| 3. Platine     | `bom-platine3.xlsx`          | *(noch hinzufügen)*  |
+Die BOM enthält neben den Bauteilen der drei Platinen auch optionale Komponenten
+(Akku, Solarpanel, Gehäuse, Plattformwaage/Wägezelle, LTE-WLAN-Router, SIM-Karte)
+mit Beispiel-Bezugsquellen.
 
-> Sobald die Excel-Dateien hier liegen, kann der Inhalt zusätzlich als Tabelle in
-> [`docs/fertigung.md`](../../docs/fertigung.md) übernommen werden, damit die BOM auch
-> ohne Excel lesbar ist.
+> Die in der BOM verlinkten Artikel sind **Beispiele/Bezugsvorschläge**. Gleichwertige
+> Bauteile anderer Hersteller sind in der Regel verwendbar. Bei gepolten Bauteilen und
+> den Netzteilen auf Typ und Einbaurichtung achten (siehe
+> [`docs/fertigung.md`](../../docs/fertigung.md)).

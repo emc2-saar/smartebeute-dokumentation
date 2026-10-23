@@ -68,13 +68,15 @@ Netzteil-Spannungen werden eingestellt und gemessen.
 
 - Spannung an **Solar +/−** (Klemme **SOL**) anlegen.
 - **Zum Einstellen der Spannungen** eine Quelle mit **16–40 V** verwenden (z. B. ein
-  **Werkzeugakku** oder eine **Solarzelle**).
+  **Werkzeugakku** oder eine **Solarzelle**). **Ohne den Solarladeregler** (reiner
+  Akku-/Netzbetrieb) reichen auch **6–40 V**.
 - **Polung (+ / −) beachten.**
 
 > ℹ️ **Warum 16–40 V und nicht 6–40 V?** Im normalen Betrieb akzeptiert die Waage
-> **6–40 V** (siehe [Versorgungsvarianten](#versorgungsvarianten)). Für das **Einstellen am
-> Solar-Eingang** über den Laderegler wird hier eine etwas höhere Mindestspannung
-> (**ab 16 V**) genutzt, damit der Laderegler die **14,3 V** sicher ausregeln kann.
+> **6–40 V** (siehe [Versorgungsvarianten](#versorgungsvarianten)). Die höhere
+> Mindestspannung (**ab 16 V**) wird **nur** dann benötigt, wenn der **Solarladeregler**
+> bestückt ist – damit er die **14,3 V** sicher ausregeln kann. **Ohne Solarladeregler
+> reichen auch hier 6–40 V.**
 
 ### 2. Messpunkt (Messheader unter dem ESP32)
 

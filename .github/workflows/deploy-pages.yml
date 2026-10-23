@@ -1,0 +1,98 @@
+name: Build firmware & deploy GitHub Pages
+
+on:
+  # Deploy on every push to the default branch
+  push:
+    branches:
+      - main
+  # Allow manual runs from the Actions tab
+  workflow_dispatch:
+
+# Permissions required for GitHub Pages deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment; don't cancel in-progress runs
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  # 1) Compile the ESPHome firmware in the cloud (no local install needed)
+  build-firmware:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build ESPHome firmware
+        id: esphome-build
+        uses: esphome/build-action@v7.0.0
+        with:
+          yaml-file: software/smarterBienenstock.yaml
+          # Produces a manifest.json directly usable by ESP Web Tools
+          complete-manifest: true
+          release-summary: "Automatisch gebaute Firmware der Imker-Waage (smartebeute)."
+
+      - name: Collect firmware for Pages
+        run: |
+          mkdir -p firmware
+          # The action outputs a folder named after the device + platform variant
+          cp -r "${{ steps.esphome-build.outputs.name }}"/* firmware/
+          # ESP Web Tools on the page loads firmware/manifest.json
+          ls -R firmware
+
+      - name: Upload firmware artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: firmware
+          retention-days: 7
+
+  # 2) Assemble the static site (docs page + downloads + firmware) and deploy
+  deploy:
+    needs: build-firmware
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download firmware artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware
+          path: firmware
+
+      - name: Prepare static site
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp LICENSE _site/
+          cp -r images _site/
+          # Downloadable hardware files referenced from the page (BOM, Gerber, Schaltpläne)
+          mkdir -p _site/hardware/bom _site/hardware/gerber _site/hardware/schaltplan
+          cp hardware/bom/BOM-Bienenbeute.xlsx _site/hardware/bom/
+          cp hardware/gerber/*.zip _site/hardware/gerber/
+          cp hardware/schaltplan/*.pdf _site/hardware/schaltplan/
+          # Compiled firmware + ESP Web Tools manifest
+          mkdir -p _site/firmware
+          cp -r firmware/* _site/firmware/
+          # .nojekyll stops GitHub Pages from running Jekyll over the files
+          touch _site/.nojekyll
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

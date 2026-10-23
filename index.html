@@ -330,6 +330,33 @@
     }
     .hero h1 { font-size: 1.5rem; }
   }
+
+  /* ---------- Flash button (ESP Web Tools) ---------- */
+  .flash-box { margin: 1.2rem 0; }
+  .flash-btn {
+    background: var(--honey);
+    color: #fff;
+    border: none;
+    padding: .8rem 1.4rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: background .15s ease;
+  }
+  .flash-btn:hover { background: var(--honey-dark); }
+  esp-web-install-button[install-unsupported] .flash-btn,
+  esp-web-install-button[install-not-allowed] .flash-btn { display: none; }
+  esp-web-install-button span[slot="unsupported"],
+  esp-web-install-button span[slot="not-allowed"] {
+    display: inline-block;
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-line);
+    border-radius: 8px;
+    padding: .6rem .9rem;
+    font-size: .9rem;
+  }
 </style>
 </head>
 <body>
@@ -361,6 +388,7 @@
       <li><a href="#kalibrieren" class="sub">Kalibrierung</a></li>
       <li><a href="#montage">5 · Montage &amp; Betrieb</a></li>
       <li><a href="#status">Status / offen</a></li>
+      <li><a href="#haftung">Haftungsausschluss</a></li>
     </ul>
   </nav>
 
@@ -369,7 +397,7 @@
       <span class="tag">🍯 Für Imker zum Nachbau</span>
       <h1>Imker-Waage (Stockwaage)</h1>
       <p>Selbst entwickelte Bienenstock-Waage auf ESP32-Basis: Gewicht, Umweltwerte und
-         Energie im Blick – Daten per WLAN (ThingSpeak) und LoRa.</p>
+         Energie im Blick – Daten per WLAN (ThingSpeak).</p>
     </div>
 
     <!-- ÜBERBLICK -->
@@ -377,7 +405,7 @@
       <h2>Überblick</h2>
       <p>Die Waage misst laufend das <strong>Gewicht</strong> eines Bienenstocks sowie
          weitere <strong>Umweltwerte</strong> und überträgt die Daten per <strong>WLAN</strong>
-         (an ThingSpeak) und <strong>LoRa</strong>. Als Software kommt <strong>ESPHome</strong>
+         (an ThingSpeak). Als Software kommt <strong>ESPHome</strong>
          zum Einsatz. Die Platinen sind ein eigenes Design und bei
          <strong>JLCPCB</strong> nachbestellbar.</p>
 
@@ -388,11 +416,11 @@
 
       <table>
         <tr><th>Eigenschaft</th><th>Wert</th></tr>
-        <tr><td>Controller</td><td>ESP32 (zwei Footprint-Varianten möglich)</td></tr>
+        <tr><td>Controller</td><td>ESP32 DevKit V4 (zwei Footprint-Varianten möglich)</td></tr>
         <tr><td>Gewicht</td><td>2× Wägesensoren über 2× HX711</td></tr>
         <tr><td>Umwelt</td><td>BME280 (Temp./Feuchte/Druck), BMP280 (Temp./Druck), bis 3× DS18B20, Mikrofon, BH1750 (Helligkeit)</td></tr>
         <tr><td>Energie</td><td>INA219 (Spannung &amp; Strom Batterie/Solar)</td></tr>
-        <tr><td>Datenübertragung</td><td>WLAN → ThingSpeak, zusätzlich LoRa</td></tr>
+        <tr><td>Datenübertragung</td><td>WLAN → ThingSpeak</td></tr>
         <tr><td>Software</td><td>ESPHome (eigene Konfiguration)</td></tr>
         <tr><td>Stromversorgung</td><td>Akku/Netzteil 6–40 V, Solarmodul bis 30 W / max. 40 V</td></tr>
         <tr><td>Platinen</td><td>Eigenes Design, nachbestellbar bei JLCPCB</td></tr>
@@ -409,7 +437,7 @@
     <section id="hardware">
       <h2>1 · Hardware &amp; Platinen</h2>
       <p>Herzstück ist ein <strong>ESP32</strong>, der die Sensoren ausliest und die Daten
-         per WLAN und LoRa überträgt. Das System besteht aus drei eigenen Platinen, die über
+         per WLAN überträgt. Das System besteht aus drei eigenen Platinen, die über
          ein <strong>RJ45-Kabel</strong> verbunden sind.</p>
 
       <table>
@@ -455,12 +483,22 @@
       <h4>Wägesensoren &amp; HX711</h4>
       <p>Die Wägesensoren werden über die HX711 ausgewertet. Die Anschluss-Klemmen heißen
          <code>Waage1</code> und <code>Waage2</code> und liegen nahe den HX711.</p>
+      <p>Es funktionieren praktisch <strong>alle gängigen Wägezellen</strong> – sie sind
+         austauschbar; ein konkretes Modell (Plattformwaage) ist in der
+         <a href="hardware/bom/BOM-Bienenbeute.xlsx">BOM</a> verlinkt. Die nötige
+         <strong>Belastbarkeit</strong> richtet sich nach dem erwarteten Gewicht und danach,
+         ob <strong>eine oder zwei</strong> Wägezellen verbaut werden.</p>
       <div class="callout ok">
-        <p><span class="lbl">✅ Welche Wägezelle?</span> Grundsätzlich funktionieren
-        <strong>alle gängigen Wägezellen</strong> – sie sind austauschbar. Entscheidend ist
-        die <strong>Kalibrierung</strong> nach dem Einbau.</p>
+        <p><span class="lbl">✅ Welche Wägezelle?</span> Entscheidend ist nicht der genaue Typ,
+        sondern die <strong>Kalibrierung</strong> nach dem Einbau. Bei günstigen
+        <strong>Paketwaagen (eBay)</strong> sollte die einzelne Wägezelle mit
+        <strong>mindestens 150 kg</strong> belastbar sein.</p>
       </div>
-      <div class="todo">genauer Sensortyp, Belastbarkeit (kg), Verschaltung und Pinbelegung.</div>
+      <div class="callout warn">
+        <p><span class="lbl">⚠️ Pinbelegung:</span> Die Belegung ist je nach Zelle
+        <strong>unterschiedlich</strong> und muss durch <strong>Ausprobieren</strong> ermittelt
+        werden (Rohwerte müssen bei Belastung steigen).</p>
+      </div>
 
       <h4>BMP280 auf der Rückseite</h4>
       <div class="callout info">
@@ -497,9 +535,9 @@
                    RJ45
                      |
          [ Hauptplatine (BASIS-PCBee) ]
-   ESP32 · 2× HX711 (Waage1/Waage2) · BMP280 · INA219 · LoRa
+   ESP32 · 2× HX711 (Waage1/Waage2) · BMP280 · INA219
          |                              |
-   Stromversorgung                  Funk: WLAN + LoRa
+   Stromversorgung                  Funk: WLAN
  (SOL / BAT / SRV)                 (WLAN → ThingSpeak)
                      |
                    RJ45
@@ -516,9 +554,23 @@
          <strong>eigenen Gerber-Dateien</strong> separat bestellt.</p>
 
       <div class="callout note">
-        <p><span class="lbl">📁 Ablage der Dateien:</span> Gerber unter
-        <code>hardware/gerber/</code>, Stücklisten (BOM, Excel) unter <code>hardware/bom/</code>,
-        Schaltpläne unter <code>hardware/schaltplan/</code>. <em>(Dateien werden noch hinzugefügt.)</em></p>
+        <p><span class="lbl">📁 Dateien im Repository:</span> Die
+        <a href="hardware/bom/BOM-Bienenbeute.xlsx">Stückliste (BOM, Excel)</a> liegt unter
+        <code>hardware/bom/</code>, die <strong>Gerber-Dateien</strong> unter
+        <code>hardware/gerber/</code> und die <strong>Schaltpläne (PDF)</strong> unter
+        <code>hardware/schaltplan/</code>.</p>
+        <table>
+          <tr><th>Platine</th><th>Gerber</th><th>Schaltplan</th></tr>
+          <tr><td>Deckel</td>
+              <td><a href="hardware/gerber/Gerber_Deckel-PCBee_V0.2.zip">Gerber_Deckel-PCBee_V0.2.zip</a></td>
+              <td><a href="hardware/schaltplan/Schaltplan_Deckel-PCBee_V0.2.pdf">Schaltplan (PDF)</a></td></tr>
+          <tr><td>Haupt</td>
+              <td><a href="hardware/gerber/Gerber_Main-PCBee_V0.5.zip">Gerber_Main-PCBee_V0.5.zip</a></td>
+              <td><a href="hardware/schaltplan/Schaltplan_Main-PCBee_V0.5.pdf">Schaltplan (PDF)</a></td></tr>
+          <tr><td>Umgebung</td>
+              <td><a href="hardware/gerber/Gerber_Umgebungs-PCBee.zip">Gerber_Umgebungs-PCBee.zip</a></td>
+              <td><a href="hardware/schaltplan/Schaltplan_Umgebungs-PCBee_.pdf">Schaltplan (PDF)</a></td></tr>
+        </table>
       </div>
 
       <h3>Beschriftung auf der Platine</h3>
@@ -584,7 +636,7 @@
 
       <h3 id="bestromen">Erstes Bestromen &amp; Spannungen einstellen</h3>
       <ol class="steps">
-        <li><strong>Spannung anlegen</strong> an <code>SOL</code> (Solar +/−), zum Einstellen 16–40 V (z. B. Werkzeugakku). Polung beachten.</li>
+        <li><strong>Spannung anlegen</strong> an <code>SOL</code> (Solar +/−), zum Einstellen 16–40 V (z. B. Werkzeugakku). Polung beachten. <em>Ohne Solarladeregler reichen auch 6–40 V.</em></li>
         <li><strong>Messheader</strong> unter dem ESP32 nutzen: <code>Vsol</code>, <code>Vbat</code>, <code>3V3</code>, <code>5V0</code>, <code>GND</code>. GND = Minus (schwarz).</li>
         <li><strong>Batteriespannung 14,3 V</strong> am rechten Netzteil-Poti einstellen (rechtsrum höher, mehrere Umdrehungen) – nur bei Solar.</li>
         <li><strong>5-V-Versorgung</strong> auf genau 5,0 V einstellen.</li>
@@ -594,8 +646,9 @@
 
       <div class="callout info">
         <p><span class="lbl">ℹ️ Warum 16–40 V zum Einstellen?</span> Im Betrieb genügen 6–40 V.
-        Zum Einstellen am Solar-Eingang wird eine höhere Mindestspannung (ab 16 V) genutzt,
-        damit der Laderegler die 14,3 V sicher ausregelt.</p>
+        Nur wenn der <strong>Solarladeregler</strong> bestückt ist, wird am Solar-Eingang eine
+        höhere Mindestspannung (ab 16 V) benötigt, damit der Laderegler die 14,3 V sicher
+        ausregelt. <strong>Ohne Solarladeregler reichen auch hier 6–40 V.</strong></p>
       </div>
 
       <div class="gallery">
@@ -622,12 +675,14 @@
       <h2>4 · Software (ESPHome)</h2>
       <p>Die Firmware basiert auf <a href="https://esphome.io/" target="_blank" rel="noopener">ESPHome</a>
          und lässt sich per OTA aktualisieren. Sie liest alle Sensoren aus und sendet die
-         Daten per WLAN an ThingSpeak (zusätzlich LoRa).</p>
+         Daten per WLAN an ThingSpeak.</p>
 
       <div class="callout note">
-        <p><span class="lbl">📦 Software auf GitHub:</span> Firmware und die Anleitung zum
-        <strong>ESP Web Flasher</strong> liegen in einem GitHub-Repository.
-        <em>(Link wird noch nachgereicht.)</em></p>
+        <p><span class="lbl">📦 Software in diesem Repository:</span> Die ESPHome-Konfiguration
+        liegt im Ordner <code>software/</code> – Haupt-Datei
+        <code>smarterBienenstock.yaml</code> (plus <code>fft_include.h</code> und
+        <code>arduinoFFT.h</code> für die Frequenzanalyse des Mikrofons). Board:
+        <code>az-delivery-devkit-v4</code>, Gerätename <code>smartebeute</code>.</p>
       </div>
 
       <h3 id="flashen">Flashen &amp; Erstkonfiguration</h3>
@@ -636,9 +691,39 @@
         <strong>USB-Buchse am ESP32-DevKit</strong> – <strong>nicht</strong> über die
         USB-A-Buchse der Platine (die führt nur 5 V).</p>
       </div>
+
+      <h4>Variante A: Direkt im Browser flashen (ohne Installation)</h4>
+      <p>Die Firmware wird automatisch gebaut und hier bereitgestellt. Zum Flashen genügt ein
+         Browser mit <strong>Web Serial</strong> (Chrome oder Edge am Desktop) – es muss
+         <strong>nichts installiert</strong> werden.</p>
+      <div class="flash-box">
+        <esp-web-install-button manifest="firmware/manifest.json">
+          <button slot="activate" class="flash-btn">🔌 Imker-Waage flashen</button>
+          <span slot="unsupported">Dein Browser unterstützt kein Web Serial – bitte
+            <strong>Chrome</strong> oder <strong>Edge</strong> am Desktop verwenden.</span>
+          <span slot="not-allowed">Web Serial ist nur über eine sichere Verbindung (HTTPS)
+            möglich.</span>
+        </esp-web-install-button>
+      </div>
+      <ol class="steps">
+        <li>ESP32-DevKit per USB-Kabel mit dem Rechner verbinden.</li>
+        <li>Oben auf <strong>„Imker-Waage flashen"</strong> klicken und den seriellen Port auswählen.</li>
+        <li>Nach dem Flashen WLAN direkt im Dialog einrichten (oder über den Hotspot, siehe unten).</li>
+      </ol>
+
+      <h4>Variante B: Selbst kompilieren (ESPHome)</h4>
       <ol class="steps">
         <li>Rechner (Browser mit Web Serial, z. B. Chrome/Edge) per USB mit dem ESP32-DevKit verbinden.</li>
-        <li>GitHub-Repo öffnen und der <strong>ESP-Web-Flasher</strong>-Anleitung folgen.</li>
+        <li><code>software/smarterBienenstock.yaml</code> mit ESPHome kompilieren und flashen (CLI, Add-on oder Web Installer).</li>
+      </ol>
+      <div class="callout info">
+        <p><span class="lbl">ℹ️ Cloud-Build:</span> Die Binary wird per GitHub Action
+        (<code>esphome/build-action</code>) automatisch in der Cloud gebaut – auch dafür ist
+        <strong>keine lokale ESPHome-Installation</strong> nötig.</p>
+      </div>
+
+      <h4>Erstkonfiguration (WLAN-Hotspot)</h4>
+      <ol class="steps">
         <li>Nach dem Flashen startet die Waage einen WLAN-Hotspot <code>smartebeute</code> (ohne Passwort).</li>
         <li>Mit dem Hotspot verbinden → im Portal das eigene WLAN auswählen und Zugangsdaten eingeben.</li>
         <li>Danach ist die Waage im eigenen Netz erreichbar unter <a href="http://smartebeute.local">http://smartebeute.local</a> (OTA-Updates möglich).</li>
@@ -650,12 +735,22 @@
       <ol class="steps">
         <li>Konto anlegen und <strong>zwei Channels</strong> erstellen: einen für die <strong>Beute</strong> (Gewicht), einen für die <strong>Umgebungswerte</strong>.</li>
         <li>Von beiden Channels den <strong>Write-Key</strong> notieren.</li>
-        <li>Die Write-Keys in der smartebeute-Weboberfläche eintragen.</li>
+        <li>Die Write-Keys in der smartebeute-Weboberfläche eintragen (Felder <code>WriteKey Beute</code> / <code>WriteKey Umgebung</code>).</li>
       </ol>
       <div class="callout info">
         <p><span class="lbl">ℹ️ Kein Speichern-Knopf:</span> Die Write-Keys sind sofort nach
         dem Einfügen gespeichert.</p>
       </div>
+      <table>
+        <tr><th>Feld</th><th>Channel „Beute"</th><th>Channel „Umgebung"</th></tr>
+        <tr><td>field1</td><td>Gewicht</td><td>Helligkeit</td></tr>
+        <tr><td>field2</td><td>Frequenz (Mikrofon-FFT)</td><td>Außentemperatur</td></tr>
+        <tr><td>field3</td><td>Temperatur innen</td><td>Außendruck</td></tr>
+        <tr><td>field4</td><td>Luftfeuchte innen</td><td>–</td></tr>
+        <tr><td>field5</td><td>Temperatur Brut</td><td>Busspannung (INA219)</td></tr>
+        <tr><td>field6</td><td>Temperatur Honig</td><td>Leistung (INA219)</td></tr>
+        <tr><td>field7</td><td>–</td><td>Temperatur Platine</td></tr>
+      </table>
 
       <h3 id="kalibrieren">Wägezelle anschließen &amp; Kalibrierung</h3>
       <p>Die Wägezelle hat <strong>4 Kabel</strong> → Klemmen <code>Waage1</code>/<code>Waage2</code>
@@ -679,11 +774,11 @@
         <tr><td>3</td><td>Weiß</td></tr>
         <tr><td>4 (unten)</td><td>Blau</td></tr>
       </table>
-      <p>Kalibrierung über zwei Referenzpunkte:</p>
+      <p>Kalibrierung in der Weboberfläche über zwei Referenzpunkte:</p>
       <ol class="steps">
-        <li><strong>0 kg</strong> (ohne Last) erfassen.</li>
-        <li><strong>10 kg</strong> (bekanntes Gewicht) auflegen und erfassen.</li>
-        <li>Die Software berechnet daraus die Umrechnung – danach stimmt das Gewicht.</li>
+        <li>Ohne Last den Button <strong>„Waage1 setzte 0kg"</strong> drücken.</li>
+        <li><strong>10 kg</strong> (bekanntes Gewicht) auflegen und <strong>„Waage1 setzte 10kg"</strong> drücken.</li>
+        <li>Der Sensor <strong>„Waage1 Gewicht"</strong> rechnet daraus um – danach stimmt das Gewicht (Werte werden dauerhaft gespeichert).</li>
       </ol>
     </section>
 
@@ -729,19 +824,40 @@
       <h2>Status / noch zu klären</h2>
       <div class="card">
         <ul class="checklist">
-          <li>Typ und Belastbarkeit der Wägesensoren</li>
           <li>Umgebungsplatine: zweiter Sensor-Steckplatz (neben BH1750) und Einbauort</li>
-          <li>LoRa: Funkmodul und Zielsystem (z. B. TTN / eigenes Gateway)</li>
-          <li>Gerber-Dateien, BOM-Excel und Schaltpläne ablegen (je Platine)</li>
-          <li>GitHub-Link zur Firmware (inkl. ESP-Web-Flasher-Anleitung)</li>
-          <li>Gehäuse/Schutzart und Lizenz des Projekts</li>
+          <li>Gehäuse/Schutzart</li>
         </ul>
       </div>
     </section>
 
+    <section id="haftung">
+      <h2>Haftungsausschluss</h2>
+      <div class="callout stop">
+        <p><span class="lbl">🛑 Nachbau auf eigene Gefahr:</span> Diese Dokumentation wird
+        ohne Gewähr bereitgestellt. Der <strong>EmC² Saar e.V.</strong> übernimmt
+        <strong>keine Haftung</strong> für Schäden, die aus dem Nachbau, dem Zusammenbau oder
+        dem Betrieb der Imker-Waage entstehen – insbesondere nicht für Sach-, Personen- oder
+        Folgeschäden (z. B. an Elektronik, Akkus, Bienenvölkern oder durch Arbeiten an der
+        Stromversorgung).</p>
+        <p>Der Nachbau und Betrieb erfolgt vollständig auf <strong>eigene Verantwortung und
+        eigenes Risiko</strong>. Für den sach- und fachgerechten Aufbau, die Einhaltung der
+        geltenden Vorschriften (z. B. im Umgang mit Strom und Lötarbeiten) sowie die Sicherheit
+        der verwendeten Komponenten ist allein die nachbauende Person verantwortlich.</p>
+      </div>
+    </section>
+
     <footer>
-      🐝 Imker-Waage · Nachbau-Dokumentation · für Imkerinnen und Imker zum Selbstbau.
-      Diese Seite ist eine Zusammenfassung der ausführlichen Doku im Ordner <code>docs/</code>.
+      <p>🐝 Imker-Waage · Nachbau-Dokumentation · für Imkerinnen und Imker zum Selbstbau.
+      Diese Seite ist eine Zusammenfassung der ausführlichen Doku im Ordner <code>docs/</code>.</p>
+      <p><strong>Haftungsausschluss:</strong> Nachbau und Betrieb auf eigene Gefahr. Der
+      <strong>EmC² Saar e.V.</strong> übernimmt keine Haftung für Schäden, die aus dem Nachbau
+      oder Betrieb entstehen.</p>
+      <p><strong>Lizenz:</strong> Dokumentation &amp; Hardware-Design unter
+      <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de" target="_blank" rel="noopener">CC&nbsp;BY-NC-SA&nbsp;4.0</a>
+      (Namensnennung – nicht kommerziell – Weitergabe unter gleichen Bedingungen).
+      © 2026 <strong>EmC² Saar e.V.</strong> Eine kommerzielle Nutzung ist nicht gestattet.</p>
+      <p><strong>Förderung:</strong> Gefördert vom <strong>Landkreis Sankt Wendel</strong>
+      im Rahmen von <strong>„Smart Wendeler Land"</strong>.</p>
     </footer>
   </main>
 </div>
@@ -761,5 +877,8 @@
     });
   });
 </script>
+
+<!-- ESP Web Tools: Flashen direkt im Browser (nur HTTPS, Chrome/Edge) -->
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
 </body>
 </html>

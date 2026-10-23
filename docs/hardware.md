@@ -1,8 +1,8 @@
 # Hardware & Platinen
 
 Die Imker-Waage besteht aus mehreren eigenen Platinen (eigenes Design, nachbestellbar bei
-JLCPCB – siehe [Fertigung](fertigung.md)). Herzstück ist ein **ESP32**, der die Sensoren
-ausliest und die Daten per WLAN und LoRa überträgt.
+JLCPCB – siehe [Fertigung](fertigung.md)). Herzstück ist ein **ESP32 DevKit V4**, der die
+Sensoren ausliest und die Daten per WLAN überträgt.
 
 ![Übersicht aller Bauteile des Bausatzes, ausgelegt auf einem Tisch](../images/uebersicht-alle-teile.jpeg)
 
@@ -20,8 +20,9 @@ Die Platinen sind untereinander über ein **RJ45-Kabel** verbunden (siehe unten)
 
 Sitzt im Deckel des Gehäuses und trägt die Umwelt-Sensorik:
 
-- **Mikrofon** (M1) – zur Erfassung von Stockgeräuschen; Modul mit einstellbarer
-  Verstärkung (Aufdruck „VCC 2.4–5.5V, adjustable gain")
+- **Mikrofon** (M1, MAX4466) – zur Erfassung von Stockgeräuschen; Modul mit einstellbarer
+  Verstärkung (Aufdruck „VCC 2.4–5.5V, adjustable gain"). Die Firmware ermittelt daraus per
+  **FFT** eine **Frequenz** (ADC `GPIO34`, siehe [Software](software.md))
 - **BME280** (M2) – Temperatur, Luftfeuchte und Luftdruck (I²C)
 - **Platz für bis zu 3× DS18B20** – Temperatursensoren (1-Wire); die Schraubklemmen sind mit
   **Temp1**, **Temp2** und **Temp3** beschriftet (z. B. innen/außen/Stock)
@@ -33,12 +34,11 @@ Sitzt im Deckel des Gehäuses und trägt die Umwelt-Sensorik:
 
 Die zentrale Platine im Außengehäuse enthält:
 
-- **ESP32** – Mikrocontroller, Steuerung und Funk (WLAN); die Platine unterstützt **zwei
-  ESP32-Varianten** (siehe unten)
+- **ESP32 DevKit V4** – Mikrocontroller, Steuerung und Funk (WLAN); die Platine unterstützt
+  **zwei ESP32-Varianten** (siehe unten)
 - **2× HX711** – 24-Bit-Wägeverstärker (ADC) für die Gewichtsmessung (je ein HX711 pro
   Wägekanal, auf der Platine mit **HX711** beschriftet)
 - **2× Wägesensoren** – angeschlossen über die HX711 *(Typ/Belastbarkeit noch zu ergänzen)*
-- **LoRa-Funkmodul** – für die Datenübertragung per LoRa *(Modultyp noch zu ergänzen)*
 - **Stromversorgung** – Anschluss für Akku/Netzteil und Solarmodul
   (Details siehe [Stromversorgung](stromversorgung.md))
 - **Drei Schraubklemmen** – für **Solar**, **Batterie** und **Wartungsschalter**
@@ -76,8 +76,15 @@ ESP32-Modul, das euch vorliegt. Die jeweils andere Footprint-Position bleibt fre
 > dass die Waage nach dem Einbau **kalibriert** wird (siehe
 > [Software → Kalibrierung](software.md#kalibrierung-der-waage)).
 
-> **Noch zu ergänzen:** genauer Sensortyp, Belastbarkeit (kg), Verschaltung
-> (zwei Halbbrücken zu einer Vollbrücke oder zwei getrennte Wägezellen) und Pinbelegung.
+> **Belastbarkeit:** Es funktionieren mehr oder weniger **alle Wägezellen** – ein konkretes
+> Modell (Plattformwaage) ist in der [BOM](../hardware/bom/BOM-Bienenbeute.xlsx) verlinkt.
+> Die nötige Belastbarkeit hängt vom
+> **erwarteten Gewicht** ab und davon, ob **eine oder zwei** Wägezellen verbaut werden. Die
+> günstigen **Paketwaagen von eBay** haben eine Wägezelle, die mit **mindestens 150 kg**
+> belastbar sein sollte.
+>
+> **Pinbelegung:** Die Belegung ist leider **unterschiedlich** und muss durch
+> **Ausprobieren** ermittelt werden (die Rohwerte müssen bei Belastung steigen).
 
 ### Netzteile / Spannungsversorgung auf der Platine
 
@@ -215,9 +222,9 @@ Darüber laufen Stromversorgung und die Sensor-/Bussignale zwischen den Platinen
                    RJ45
                      |
          [ Hauptplatine (BASIS-PCBee) ]
-   ESP32 · 2× HX711 (Waage1/Waage2) · BMP280 · INA219 · LoRa
+   ESP32 · 2× HX711 (Waage1/Waage2) · BMP280 · INA219
          |                              |
-   Stromversorgung                  Funk: WLAN + LoRa
+   Stromversorgung                  Funk: WLAN
  (SOL / BAT / SRV)                 (WLAN → ThingSpeak)
                      |
                    RJ45

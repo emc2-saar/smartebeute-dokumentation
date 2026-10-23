@@ -12,13 +12,20 @@ sind zusätzlich Schaltplan und Stückliste hilfreich.
 | Datei                      | Zweck                                      | Ablageort                                   |
 | -------------------------- | ------------------------------------------ | ------------------------------------------- |
 | Gerber-Dateien (`.zip`)    | Fertigung der Platine bei JLCPCB           | [`hardware/gerber/`](../hardware/gerber/)   |
-| Schaltplan (Schematic)     | Verständnis der Verschaltung               | [`hardware/schaltplan/`](../hardware/schaltplan/) *(wird noch hochgeladen)* |
-| Bestückungsplan            | Position der Bauteile                      | *(noch zu ergänzen)*                        |
-| Stückliste (BOM)           | Liste aller Bauteile zum Einkauf           | [`hardware/bom/`](../hardware/bom/)         |
+| Schaltplan (Schematic)     | Verständnis der Verschaltung               | [`hardware/schaltplan/`](../hardware/schaltplan/) |
+| Stückliste (BOM)           | Liste aller Bauteile zum Einkauf           | [`hardware/bom/BOM-Bienenbeute.xlsx`](../hardware/bom/BOM-Bienenbeute.xlsx) |
 
-> Die Gerber- und BOM-Dateien werden je Platine (Deckel, Haupt, 3. Platine) in den
-> Ordnern [`hardware/gerber/`](../hardware/gerber/) bzw. [`hardware/bom/`](../hardware/bom/)
-> abgelegt. *(Dateien werden noch hinzugefügt.)*
+> Die **BOM** liegt als Excel-Datei
+> ([`hardware/bom/BOM-Bienenbeute.xlsx`](../hardware/bom/BOM-Bienenbeute.xlsx)) für ein
+> komplettes Platinenset vor. **Gerber-Dateien** (je Platine) und **Schaltpläne** (PDF)
+> liegen in [`hardware/gerber/`](../hardware/gerber/) bzw.
+> [`hardware/schaltplan/`](../hardware/schaltplan/):
+>
+> | Platine          | Gerber                         | Schaltplan                         |
+> | ---------------- | ------------------------------ | ---------------------------------- |
+> | Deckel-Platine   | `Gerber_Deckel-PCBee_V0.2.zip` | `Schaltplan_Deckel-PCBee_V0.2.pdf` |
+> | Hauptplatine     | `Gerber_Main-PCBee_V0.5.zip`   | `Schaltplan_Main-PCBee_V0.5.pdf`   |
+> | Umgebungsplatine | `Gerber_Umgebungs-PCBee.zip`   | `Schaltplan_Umgebungs-PCBee_.pdf`  |
 
 ## Bestellung bei JLCPCB (Ablauf)
 
@@ -39,20 +46,25 @@ sind zusätzlich Schaltplan und Stückliste hilfreich.
 
 ## Bauteile / Bestückung
 
-Die vollständige Stückliste liegt als Excel-Datei je Platine unter
-[`hardware/bom/`](../hardware/bom/). Die wichtigsten Bauteile im Überblick:
+Die vollständige Stückliste liegt als Excel-Datei unter
+[`hardware/bom/BOM-Bienenbeute.xlsx`](../hardware/bom/BOM-Bienenbeute.xlsx) (inkl.
+Bezugsquellen-Links und Preisen). Die wichtigsten Bauteile im Überblick:
 
-- **ESP32** (Hauptplatine)
-- **HX711** Wägeverstärker (Hauptplatine)
-- **BME280** Umgebungssensor (Deckel-Platine)
+- **ESP32** (NodeMCU ESP-WROOM-32, Hauptplatine)
+- **2× HX711** Wägeverstärker (Hauptplatine)
+- **BME280** Umgebungssensor Temp./Feuchte/Druck (Deckel-Platine)
+- **2× BMP280** Temp./Druck · **BH1750** Helligkeit · **MAX4466** Mikrofon
 - Sockel/Klemmen für bis zu **3× DS18B20** (Deckel-Platine)
-- **Mikrofon** (Deckel-Platine)
-- **LoRa-Modul** *(Typ noch zu ergänzen)*
-- **RJ45-Buchsen** zur Verbindung der Platinen
-- Bauteile der Stromversorgung (siehe [Stromversorgung](stromversorgung.md))
+- **INA219** Stromsensor · **PL9823** LED (Hauptplatine)
+- **2× LM2596S** DC-DC-Step-Down-Netzteile, Dioden (1N5400 / 1N5822 / 1N4148), Widerstände
+- **Sicherungen** 3,15 A (5×20 mm) mit Haltern, **USB-A-Buchse**, **RJ45-Buchsen**
+- Leiterplattenklemmen (2- und 3-polig) für die Stromanschlüsse
+- Verbindung: **CAT-6-Flachkabel** zwischen den Platinen
 
-> **Noch zu ergänzen:** vollständige Stückliste je Platine inkl. Bauteilwerten und
-> Bezugsquellen; Hinweise, welche Teile von Hand gelötet werden und welche per SMT.
+> Optional in der BOM enthalten (für einen kompletten Aufbau): Akku 12 V, Solarpanel 30 W,
+> IP65-Gehäuse, Plattformwaage (150 kg, Wägezelle), LTE-WLAN-Router und SIM-Karte.
+>
+> Die verlinkten Artikel sind **Bezugsvorschläge**; gleichwertige Teile sind meist verwendbar.
 
 ## Beschriftung auf der Platine
 

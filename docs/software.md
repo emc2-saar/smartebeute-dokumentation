@@ -2,11 +2,14 @@
 
 Die Firmware des ESP32 basiert auf **[ESPHome](https://esphome.io/)**. Dadurch wird die
 Waage über eine einfache YAML-Konfiguration beschrieben und lässt sich bequem per OTA
-(Over-the-Air) aktualisieren. Die Datenübertragung erfolgt über **WLAN** und **LoRa**.
+(Over-the-Air) aktualisieren. Die Datenübertragung erfolgt über **WLAN**.
 
-> 📦 **Software und Flash-Anleitung auf GitHub:** Die Firmware (ESPHome) liegt in einem
-> GitHub-Repository. Dort ist auch beschrieben, wie die Software mit dem **ESP Web Flasher**
-> aufgespielt wird. **Repository-Link:** *(wird noch nachgereicht)*.
+> 📦 **Software in diesem Repository:** Die Firmware (ESPHome) liegt im Ordner
+> [`software/`](../software/) – die Haupt-Konfiguration ist
+> [`software/smarterBienenstock.yaml`](../software/smarterBienenstock.yaml), zusammen mit
+> den Hilfsdateien `fft_include.h` und `arduinoFFT.h` (für die Frequenzanalyse des
+> Mikrofons). Eine Übersicht (Pins, Adressen, LED-Codes) steht in
+> [`software/README.md`](../software/README.md).
 
 ## Voraussetzungen
 
@@ -23,17 +26,34 @@ Waage über eine einfache YAML-Konfiguration beschrieben und lässt sich bequem 
 
 ## Erstes Flashen (ESP Web Flasher)
 
-Das erste Aufspielen der Firmware erfolgt über den **ESP Web Flasher** direkt aus dem
-Browser. Die genaue Schritt-für-Schritt-Anleitung steht im GitHub-Repository.
+Es gibt zwei Wege. In **beiden Fällen ist keine lokale ESPHome-Installation nötig.**
+
+### Variante A: Direkt im Browser flashen (einfachste Variante)
+
+Die Firmware wird per GitHub Action automatisch gebaut und auf der Projektseite
+(GitHub Pages) bereitgestellt. Dort gibt es einen **„Imker-Waage flashen"**-Button
+(ESP Web Tools). Voraussetzung: ein Browser mit **Web Serial** (Chrome oder Edge am
+Desktop) und eine **HTTPS**-Verbindung.
 
 1. Den Rechner per **USB-Kabel mit der USB-Buchse des ESP32-DevKits** verbinden.
-2. Das **GitHub-Repository** öffnen (Link siehe oben, *wird noch nachgereicht*).
-3. Der dortigen Anleitung zum **ESP Web Flasher** folgen (Firmware im Browser auswählen und
-   auf den ESP32 flashen).
-4. Nach dem ersten Flashen startet die Waage einen **WLAN-Hotspot** zur Erstkonfiguration
+2. Auf der Projektseite den **Flash-Button** klicken und den seriellen Port auswählen.
+3. Nach dem Flashen WLAN direkt im Dialog einrichten (Improv) oder über den Hotspot
    (siehe nächster Abschnitt).
 
-> **Noch zu ergänzen:** GitHub-Repository-Link und Name/Variante der Firmware.
+### Variante B: Selbst kompilieren
+
+Die ESPHome-Konfiguration [`software/smarterBienenstock.yaml`](../software/smarterBienenstock.yaml)
+mit ESPHome kompilieren und flashen (CLI, Home-Assistant-Add-on oder ESPHome Web Installer).
+Beim Kompilieren werden `fft_include.h`/`arduinoFFT.h` sowie die arduinoFFT-Bibliothek
+automatisch eingebunden.
+
+> ℹ️ **Cloud-Build:** Das Bauen der Binary übernimmt die GitHub Action
+> `esphome/build-action` automatisch in der Cloud (siehe
+> `.github/workflows/deploy-pages.yml`). Auch hierfür muss ESPHome **nicht lokal
+> installiert** sein.
+
+> ℹ️ Das Board ist in der Konfiguration als `az-delivery-devkit-v4` (ESP32 DevKit V4) mit
+> dem Arduino-Framework hinterlegt, der Gerätename ist `smartebeute`.
 
 ## Erstkonfiguration über den Hotspot
 
@@ -60,20 +80,22 @@ das erste Mal eingerichtet (z. B. WLAN-Zugangsdaten hinterlegen).
 
 ## Konfiguration (Überblick)
 
-Die ESPHome-Konfiguration bindet u. a. folgende Komponenten ein:
+Die ESPHome-Konfiguration ([`software/smarterBienenstock.yaml`](../software/smarterBienenstock.yaml))
+bindet u. a. folgende Komponenten ein:
 
-- **Wägesensoren über HX711** – Gewichtsmessung (benötigt Kalibrierung, siehe unten)
-- **BME280** (Deckel-Platine) – Temperatur, Luftfeuchte, Luftdruck (I²C)
-- **BMP280** (Rückseite Hauptplatine) – Temperatur, Luftdruck (I²C)
-- **INA219** – Spannung und Strom von Batterie und Solarzelle (I²C)
-- **DS18B20** (bis zu 3×) – Temperatur (1-Wire)
-- **Mikrofon** – Stockgeräusche *(Auswertung noch zu ergänzen)*
-- **Helligkeitssensor** (3. Platine) *(noch zu ergänzen)*
+- **HX711** – Gewichtsmessung (`Waage1`, benötigt Kalibrierung, siehe unten)
+- **BME280** (Deckel-Platine) – Temperatur, Luftfeuchte, Luftdruck (I²C, `0x76`)
+- **BMP280** (Rückseite Hauptplatine) – Temperatur, Luftdruck (I²C, `0x77`)
+- **BMP280** (Umgebungsplatine) – Temperatur, Druck (I²C Bus 2, `0x76`)
+- **BH1750** (Umgebungsplatine) – Helligkeit (I²C Bus 2, `0x23`)
+- **INA219** – Strom, Leistung und Busspannung (I²C, `0x40`)
+- **2× DS18B20** – Temperatur (1-Wire, `GPIO4` / `GPIO27`)
+- **Mikrofon** – Frequenzanalyse per FFT (ADC `GPIO34` → Sensor „Frequenz")
+- **Status-LED** (WS2812, `GPIO33`) – signalisiert den Übertragungsstatus
 - **WLAN** – Datenübertragung an **ThingSpeak** (siehe unten)
-- **LoRa** – Datenübertragung über Funk *(Zielsystem, z. B. TTN, noch zu ergänzen)*
 
-> Die konkreten Pins, Sensor-IDs und Adressen stehen in der projektspezifischen
-> YAML-Konfiguration *(noch zu ergänzen)*.
+> Die vollständige Pin-Belegung, die I²C-Adressen und die LED-Farbcodes sind in
+> [`software/README.md`](../software/README.md) zusammengefasst.
 
 ## Wägezelle anschließen (4 Kabel)
 
@@ -110,7 +132,8 @@ Bei einer von uns angeschlossenen Wägezelle war die Belegung **von oben nach un
 | 3                                  | **Weiß**   |
 | 4 (unten)                          | **Blau**   |
 
-> **Noch zu ergänzen:** wo die Rohwerte in der Oberfläche angezeigt werden.
+> 💡 Die Rohwerte stehen in der Weboberfläche beim Sensor **„Waage1"** (der kalibrierte
+> Wert erscheint separat als **„Waage1 Gewicht"**).
 
 ## Kalibrierung der Waage
 
@@ -121,25 +144,21 @@ dass die konkret eingebaute Zelle korrekt misst.
 > Voraussetzung: Die Wägezelle ist korrekt angeschlossen (Rohwerte steigen bei Belastung,
 > siehe [Wägezelle anschließen](#wägezelle-anschließen-4-kabel)).
 
-In der Software ist dafür bereits eine **Kalibrierfunktion mit zwei Referenzgewichten**
-vorhanden:
+In der Weboberfläche (`http://smartebeute.local`) stehen dafür zwei **Buttons** und zwei
+**Referenzwerte** bereit:
 
-1. **0 kg (ohne Last):** Waage leer lassen und den Referenzpunkt **0 kg** erfassen.
-2. **10 kg (bekanntes Gewicht):** ein **10-kg-Referenzgewicht** auflegen und diesen Punkt
-   erfassen.
-3. Die Software ermittelt aus beiden Punkten die lineare Umrechnung und speichert sie.
+1. **0 kg (ohne Last):** Waage leer lassen und den Button **„Waage1 setzte 0kg"** drücken.
+2. **10 kg (bekanntes Gewicht):** ein **10-kg-Referenzgewicht** auflegen und den Button
+   **„Waage1 setzte 10kg"** drücken.
+3. Aus den beiden gespeicherten Rohwerten (`Waage1 bei 0kg` / `Waage1 bei 10kg`) berechnet
+   der Template-Sensor **„Waage1 Gewicht"** die lineare Umrechnung.
 
-Danach zeigt die Waage das Gewicht korrekt an. Bei Bedarf (z. B. nach Umbau) kann die
-Kalibrierung wiederholt werden.
-
-> **Noch zu ergänzen:** genaue Bedienung der Kalibrierfunktion (wo/wie in der Oberfläche
-> bzw. in ESPHome ausgelöst).
+Danach zeigt die Waage das Gewicht korrekt an. Die Referenzwerte werden dauerhaft
+gespeichert; bei Bedarf (z. B. nach Umbau) kann die Kalibrierung wiederholt werden.
 
 ## Datenübertragung
 
 - **WLAN:** Die Messwerte werden über WLAN an **ThingSpeak** gesendet (siehe unten).
-- **LoRa:** für Standorte ohne WLAN; Reichweite über LoRa-Funk
-  *(Gateway/Netzwerk, z. B. eigenes Gateway oder TTN, noch zu ergänzen)*.
 
 ## Daten an ThingSpeak senden
 
@@ -170,5 +189,16 @@ Die ThingSpeak-**Write-Keys** werden über die **Weboberfläche der smartebeute*
 > gespeichert**. Die Waage überträgt die Messwerte anschließend an die passenden
 > ThingSpeak-Channels.
 
-> **Noch zu ergänzen:** genaue Bezeichnung der Felder in der Oberfläche und welche einzelnen
-> Messwerte (Felder) auf welchem Channel landen.
+### Feldbelegung der Channels
+
+Die Firmware sendet im Abstand von rund einer Minute an beide Channels:
+
+| Feld   | Channel „Beute"         | Channel „Umgebung"     |
+| ------ | ----------------------- | ---------------------- |
+| field1 | Gewicht                 | Helligkeit             |
+| field2 | Frequenz (Mikrofon-FFT) | Außentemperatur        |
+| field3 | Temperatur innen        | Außendruck             |
+| field4 | Luftfeuchte innen       | –                      |
+| field5 | Temperatur Brut         | Busspannung (INA219)   |
+| field6 | Temperatur Honig        | Leistung (INA219)      |
+| field7 | –                       | Temperatur Platine     |

@@ -1,0 +1,36 @@
+Imker-Waage (Stockwaage) – Nachbau-Dokumentation und Hardware-Design
+Copyright (c) 2026 EmC² Saar e.V.
+
+Gefördert vom Landkreis Sankt Wendel im Rahmen von „Smart Wendeler Land".
+
+Dieses Werk (Dokumentation, Bilder, Schaltpläne, Gerber-Dateien, Stücklisten
+und sonstige Hardware-Design-Dateien in diesem Repository) ist lizenziert unter
+der Creative Commons Namensnennung – Nicht kommerziell – Weitergabe unter
+gleichen Bedingungen 4.0 International Lizenz (CC BY-NC-SA 4.0).
+
+Kurzfassung (keine rechtsverbindliche Zusammenfassung):
+
+  Sie dürfen:
+    - Teilen – das Material in jedwedem Format oder Medium vervielfältigen und
+      weiterverbreiten.
+    - Bearbeiten – das Material remixen, verändern und darauf aufbauen.
+
+  Unter folgenden Bedingungen:
+    - Namensnennung (BY) – Sie müssen angemessene Urheber- und Rechteangaben
+      machen, einen Link zur Lizenz beifügen und angeben, ob Änderungen
+      vorgenommen wurden.
+    - Nicht kommerziell (NC) – Sie dürfen das Material nicht für kommerzielle
+      Zwecke nutzen.
+    - Weitergabe unter gleichen Bedingungen (SA) – Wenn Sie das Material
+      remixen, verändern oder anderweitig direkt darauf aufbauen, dürfen Sie
+      Ihre Beiträge nur unter derselben Lizenz wie das Original verbreiten.
+
+Der vollständige, rechtsverbindliche Lizenztext (Legal Code) ist abrufbar unter:
+  https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.de
+
+Eine allgemein verständliche Zusammenfassung finden Sie unter:
+  https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de
+
+Hinweis zur Software: Die ESP32-Firmware (ESPHome-Konfiguration) liegt in einem
+separaten Repository und kann abweichend lizenziert sein. CC-Lizenzen sind nicht
+für Software gedacht.
