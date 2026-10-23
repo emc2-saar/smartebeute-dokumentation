@@ -7,7 +7,15 @@ eine YAML-Konfiguration beschrieben. Alle Dateien liegen in diesem Ordner.
 | ------------------------- | ------------------------------------------------------------- |
 | `smarterBienenstock.yaml` | Haupt-Konfiguration (Sensoren, Kalibrierung, ThingSpeak, LED) |
 | `fft_include.h`           | Include für die FFT-Bibliothek (`#include <arduinoFFT.h>`)    |
-| `arduinoFFT.h`            | Kopie der arduinoFFT-Bibliothek (Frequenzanalyse Mikrofon)    |
+
+> **Hinweis zur FFT-Bibliothek:** Die Bibliothek **arduinoFFT** (Frequenzanalyse des
+> Mikrofons) ist **nicht** Bestandteil dieses Repositorys. Sie steht unter der
+> **GNU GPL v3** (© Didier Longueville, Enrique Condes) und wird beim Build automatisch
+> aus dem Original-Repository geladen:
+> [`github.com/kosme/arduinoFFT`](https://github.com/kosme/arduinoFFT) (Version `v1.6.2`,
+> eingebunden über `libraries:` in `smarterBienenstock.yaml`). Es liegt bewusst **keine
+> Kopie** der Bibliothek im Repo, um den Lizenzkonflikt mit der CC-BY-NC-SA-Lizenz dieser
+> Dokumentation zu vermeiden.
 
 ## Eckdaten der Konfiguration
 

@@ -680,8 +680,11 @@
       <div class="callout note">
         <p><span class="lbl">📦 Software in diesem Repository:</span> Die ESPHome-Konfiguration
         liegt im Ordner <code>software/</code> – Haupt-Datei
-        <code>smarterBienenstock.yaml</code> (plus <code>fft_include.h</code> und
-        <code>arduinoFFT.h</code> für die Frequenzanalyse des Mikrofons). Board:
+        <code>smarterBienenstock.yaml</code> (plus <code>fft_include.h</code> für die
+        Frequenzanalyse des Mikrofons). Die FFT-Bibliothek <strong>arduinoFFT</strong> (GPL v3)
+        wird beim Build automatisch aus dem
+        <a href="https://github.com/kosme/arduinoFFT" target="_blank" rel="noopener">Original-Repository</a>
+        geladen und liegt nicht hier im Projekt. Board:
         <code>az-delivery-devkit-v4</code>, Gerätename <code>smartebeute</code>.</p>
       </div>
 
@@ -847,6 +850,13 @@
       © 2026 <strong>EmC² Saar e.V.</strong> Eine kommerzielle Nutzung ist nicht gestattet.</p>
       <p><strong>Förderung:</strong> Gefördert vom <strong>Landkreis Sankt Wendel</strong>
       im Rahmen von <strong>„Smart Wendeler Land"</strong>.</p>
+      <p><strong>Marken- &amp; Produkthinweis:</strong> Genannte Produkt-, Firmen- und
+      Markennamen (z. B. ESP32, ESPHome, ThingSpeak, JLCPCB, AZ-Delivery, arduinoFFT sowie
+      Bauteil- und Herstellerbezeichnungen) sind Eigentum der jeweiligen Rechteinhaber. Die
+      Nennung erfolgt ausschließlich zu beschreibenden Zwecken und begründet keine Verbindung
+      zu oder Unterstützung durch die jeweiligen Inhaber. Verlinkte Artikel sind unverbindliche
+      Bezugsvorschläge. Die FFT-Bibliothek <strong>arduinoFFT</strong> ist nicht Teil dieses
+      Projekts und steht unter der <strong>GNU GPL v3</strong>.</p>
     </footer>
   </main>
 </div>

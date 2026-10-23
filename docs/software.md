@@ -7,9 +7,10 @@ Waage über eine einfache YAML-Konfiguration beschrieben und lässt sich bequem 
 > 📦 **Software in diesem Repository:** Die Firmware (ESPHome) liegt im Ordner
 > [`software/`](../software/) – die Haupt-Konfiguration ist
 > [`software/smarterBienenstock.yaml`](../software/smarterBienenstock.yaml), zusammen mit
-> den Hilfsdateien `fft_include.h` und `arduinoFFT.h` (für die Frequenzanalyse des
-> Mikrofons). Eine Übersicht (Pins, Adressen, LED-Codes) steht in
-> [`software/README.md`](../software/README.md).
+> der Hilfsdatei `fft_include.h` (für die Frequenzanalyse des Mikrofons). Die FFT-Bibliothek
+> **arduinoFFT** (GPL v3) ist **nicht** Teil des Repos und wird beim Build automatisch aus
+> dem [Original-Repository](https://github.com/kosme/arduinoFFT) geladen. Eine Übersicht
+> (Pins, Adressen, LED-Codes) steht in [`software/README.md`](../software/README.md).
 
 ## Voraussetzungen
 
@@ -44,8 +45,8 @@ Desktop) und eine **HTTPS**-Verbindung.
 
 Die ESPHome-Konfiguration [`software/smarterBienenstock.yaml`](../software/smarterBienenstock.yaml)
 mit ESPHome kompilieren und flashen (CLI, Home-Assistant-Add-on oder ESPHome Web Installer).
-Beim Kompilieren werden `fft_include.h`/`arduinoFFT.h` sowie die arduinoFFT-Bibliothek
-automatisch eingebunden.
+Beim Kompilieren wird `fft_include.h` eingebunden; die arduinoFFT-Bibliothek lädt ESPHome
+dabei automatisch aus dem Original-Repository (`libraries:` in der YAML).
 
 > ℹ️ **Cloud-Build:** Das Bauen der Binary übernimmt die GitHub Action
 > `esphome/build-action` automatisch in der Cloud (siehe

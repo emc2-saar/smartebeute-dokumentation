@@ -97,6 +97,18 @@ Namensnennung erfolgen und die gleichen Lizenzbedingungen beibehalten werden.
 > Die ESP32-Firmware (ESPHome) liegt in einem separaten Repository und kann abweichend
 > lizenziert sein.
 
+> Die FFT-Bibliothek **arduinoFFT** ist nicht Teil dieses Repositorys. Sie steht unter der
+> **GNU GPL v3** und wird beim Build aus dem Original-Repository geladen (siehe
+> [`software/README.md`](software/README.md)).
+
+## Marken- und Produkthinweis
+
+Genannte Produkt-, Firmen- und Markennamen (z. B. **ESP32**, **ESPHome**, **ThingSpeak**,
+**JLCPCB**, **AZ-Delivery**, **arduinoFFT** sowie Bauteil- und Herstellerbezeichnungen) sind
+Eigentum der jeweiligen Rechteinhaber. Die Nennung erfolgt ausschließlich zu beschreibenden
+Zwecken (Nachbau-Dokumentation) und begründet keine Verbindung zu oder Unterstützung durch
+die jeweiligen Inhaber. In der BOM verlinkte Artikel sind unverbindliche Bezugsvorschläge.
+
 ## Förderung
 
 Dieses Projekt wurde vom **Landkreis Sankt Wendel** im Rahmen von
